@@ -410,7 +410,7 @@ const showLocationSuggestions = ref(false)
 const hasLocationPermission = ref(false)
 const isLocating = ref(false)
 const currentLocation = ref(null)
-const PROXIMITY_RADIUS_METERS = 200
+const PROXIMITY_RADIUS_METERS = 300
 let map = null
 let marker = null
 let currentLocationMarker = null
@@ -662,7 +662,7 @@ const handleLocationBlur = () => {
 
 const selectLocationSuggestion = (suggestion) => {
   if (!isPointNearCurrentLocation(suggestion.latitude, suggestion.longitude)) {
-    error.value = 'Please select a location within 200 meters of your current positon.'
+    error.value = 'Please select a location within 300 meters of your current positon.'
     return
   }
 
@@ -767,7 +767,7 @@ const validateForm = () => {
     form.value.longitude &&
     !isPointNearCurrentLocation(form.value.latitude, form.value.longitude)
   ) {
-    errors.value.location = 'Please select a location within 200 meters of your current positon.'
+    errors.value.location = 'Please select a location within 300 meters of your current positon.'
     isValid = false
   }
 
@@ -795,7 +795,7 @@ const initMap = () => {
     const { lat, lng } = event.latlng
 
     if (!isPointNearCurrentLocation(lat, lng)) {
-      error.value = 'Please select a location within 200 meters of your current positon.'
+      error.value = 'Please select a location within 300 meters of your current positon.'
       return
     }
 
@@ -826,7 +826,7 @@ const submitIssue = async () => {
   }
 
   if (!isPointNearCurrentLocation(form.value.latitude, form.value.longitude)) {
-    error.value = 'Please select a location within 200 meters of your current positon.'
+    error.value = 'Please select a location within 300 meters of your current positon.'
     return
   }
 

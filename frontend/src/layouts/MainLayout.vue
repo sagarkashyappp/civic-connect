@@ -26,38 +26,52 @@
 
             <!-- Authenticated Links -->
             <template v-if="authStore.isAuthenticated">
-              <router-link
-                to="/dashboard"
-                active-class="bg-primary/10 text-primary font-semibold rounded-lg"
-                class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
-                >Dashboard</router-link
-              >
-              <router-link
-                to="/issues"
-                active-class="bg-primary/10 text-primary font-semibold rounded-lg"
-                class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
-                >Issues</router-link
-              >
-              <router-link
-                to="/issues-map"
-                active-class="bg-primary/10 text-primary font-semibold rounded-lg"
-                class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
-                >Map</router-link
-              >
-
               <!-- Admin Links -->
               <template v-if="authStore.isAdmin">
                 <router-link
                   to="/admin/dashboard"
                   active-class="bg-primary/10 text-primary font-semibold rounded-lg"
                   class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
-                  >Admin</router-link
+                  >Dashboard</router-link
                 >
                 <router-link
                   to="/admin/analytics"
                   active-class="bg-primary/10 text-primary font-semibold rounded-lg"
                   class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
                   >Analytics</router-link
+                >
+                <router-link
+                  to="/admin/issues"
+                  active-class="bg-primary/10 text-primary font-semibold rounded-lg"
+                  class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
+                  >Issues</router-link
+                >
+                <router-link
+                  to="/issues-map"
+                  active-class="bg-primary/10 text-primary font-semibold rounded-lg"
+                  class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
+                  >Map</router-link
+                >
+              </template>
+
+              <template v-else-if="authStore.isCitizen">
+                <router-link
+                  :to="dashboardRoute"
+                  active-class="bg-primary/10 text-primary font-semibold rounded-lg"
+                  class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
+                  >Dashboard</router-link
+                >
+                <router-link
+                  to="/issues"
+                  active-class="bg-primary/10 text-primary font-semibold rounded-lg"
+                  class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
+                  >Issues</router-link
+                >
+                <router-link
+                  to="/issues-map"
+                  active-class="bg-primary/10 text-primary font-semibold rounded-lg"
+                  class="text-text-light hover:text-primary px-3 py-2 font-medium transition-colors"
+                  >Map</router-link
                 >
               </template>
 
@@ -161,22 +175,23 @@
         <div class="space-y-1 px-4 pt-2 pb-6">
           <template v-if="authStore.isAuthenticated">
             <router-link
-              to="/dashboard"
+              v-if="authStore.isCitizen"
+              :to="dashboardRoute"
               active-class="bg-primary/10 text-primary font-semibold"
               class="text-text hover:text-primary block rounded-lg px-3 py-3 text-base font-medium hover:bg-gray-50"
               @click="mobileMenuOpen = false"
               >Dashboard</router-link
             >
-            <router-link
-              to="/issues"
-              active-class="bg-primary/10 text-primary font-semibold"
-              class="text-text hover:text-primary block rounded-lg px-3 py-3 text-base font-medium hover:bg-gray-50"
-              @click="mobileMenuOpen = false"
-              >All Issues</router-link
-            >
 
             <!-- Citizen Links -->
             <template v-if="authStore.isCitizen">
+              <router-link
+                to="/issues"
+                active-class="bg-primary/10 text-primary font-semibold"
+                class="text-text hover:text-primary block rounded-lg px-3 py-3 text-base font-medium hover:bg-gray-50"
+                @click="mobileMenuOpen = false"
+                >Issues</router-link
+              >
               <router-link
                 to="/my-issues"
                 active-class="bg-primary/10 text-primary font-semibold"
@@ -193,7 +208,7 @@
                 active-class="bg-primary/10 text-primary font-semibold"
                 class="text-text hover:text-primary block rounded-lg px-3 py-3 text-base font-medium hover:bg-gray-50"
                 @click="mobileMenuOpen = false"
-                >Admin Dashboard</router-link
+                >Dashboard</router-link
               >
               <router-link
                 to="/admin/analytics"
@@ -319,6 +334,12 @@ import logoMobile from '@/assets/civic-connect-logo-mobile.png'
 const authStore = useAuthStore()
 const router = useRouter()
 const mobileMenuOpen = ref(false)
+
+const dashboardRoute = computed(() => {
+  if (authStore.isAdmin) return '/admin/dashboard'
+  if (authStore.isStaff) return '/staff/dashboard'
+  return '/dashboard'
+})
 
 const userInitials = computed(() => {
   if (authStore.user?.first_name && authStore.user?.last_name) {

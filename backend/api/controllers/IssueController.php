@@ -16,6 +16,15 @@ class IssueController {
     }
 
     /**
+     * Get latest assigned staff for an issue from issue_updates.
+     */
+    private function getAssignedStaffForIssue($issue_id) {
+        $stmt = $this->pdo->prepare("\n            SELECT u.id, u.first_name, u.last_name, u.email\n            FROM issue_updates iu\n            JOIN users u ON iu.user_id = u.id\n            WHERE iu.issue_id = ?\n              AND iu.update_type = 'assigned'\n              AND u.role = 'staff'\n            ORDER BY iu.created_at DESC, iu.id DESC\n            LIMIT 1\n        ");
+        $stmt->execute([$issue_id]);
+        return $stmt->fetch();
+    }
+
+    /**
      * Create a new issue
      * POST /api/issues
      */
@@ -171,6 +180,18 @@ class IssueController {
             // Add user_name field
             $issue['user_name'] = trim($issue['first_name'] . ' ' . $issue['last_name']);
 
+            // Add latest assigned staff info
+            $assigned_staff = $this->getAssignedStaffForIssue($issue_id);
+            if ($assigned_staff) {
+                $issue['assigned_staff_id'] = (int)$assigned_staff['id'];
+                $issue['assigned_staff_name'] = trim($assigned_staff['first_name'] . ' ' . $assigned_staff['last_name']);
+                $issue['assigned_staff_email'] = $assigned_staff['email'];
+            } else {
+                $issue['assigned_staff_id'] = null;
+                $issue['assigned_staff_name'] = null;
+                $issue['assigned_staff_email'] = null;
+            }
+
             // Convert numeric fields to proper types
             if ($issue['latitude'] !== null) {
                 $issue['latitude'] = (float)$issue['latitude'];
@@ -211,6 +232,7 @@ class IssueController {
         $search = $_GET['search'] ?? null;
         $sort_by = $_GET['sort_by'] ?? 'created_at';
         $sort_order = ($_GET['sort_order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+        $assigned_to_me = isset($_GET['assigned_to_me']) && $_GET['assigned_to_me'] === 'true';
 
         // Validate sort parameters
         $allowed_sorts = ['created_at', 'upvote_count', 'title', 'priority'];
@@ -242,6 +264,21 @@ class IssueController {
                 $search_term = "%$search%";
                 $params[] = $search_term;
                 $params[] = $search_term;
+            }
+
+            // Filter for issues assigned to current user
+            if ($assigned_to_me && $current_user) {
+                $where[] = "i.id IN (
+                    SELECT issue_id FROM issue_updates 
+                    WHERE user_id = ? AND update_type = 'assigned'
+                    AND (created_at, id) = (
+                        SELECT MAX(created_at), MAX(id) 
+                        FROM issue_updates iu2 
+                        WHERE iu2.issue_id = issue_updates.issue_id 
+                        AND iu2.update_type = 'assigned'
+                    )
+                )";
+                $params[] = $current_user['user_id'];
             }
 
             $where_clause = implode(' AND ', $where);
@@ -319,6 +356,18 @@ class IssueController {
 
                 // Add user_name field
                 $issue['user_name'] = trim($issue['first_name'] . ' ' . $issue['last_name']);
+
+                // Add latest assigned staff info
+                $assigned_staff = $this->getAssignedStaffForIssue($issue['id']);
+                if ($assigned_staff) {
+                    $issue['assigned_staff_id'] = (int)$assigned_staff['id'];
+                    $issue['assigned_staff_name'] = trim($assigned_staff['first_name'] . ' ' . $assigned_staff['last_name']);
+                    $issue['assigned_staff_email'] = $assigned_staff['email'];
+                } else {
+                    $issue['assigned_staff_id'] = null;
+                    $issue['assigned_staff_name'] = null;
+                    $issue['assigned_staff_email'] = null;
+                }
             }
 
             sendResponse([
@@ -373,6 +422,47 @@ class IssueController {
             $allowed_fields = ['title', 'description', 'category', 'location', 'latitude', 'longitude', 'priority', 'status'];
             $update_fields = [];
             $update_values = [];
+
+            // Admin-only assignment of issue to staff.
+            if (isset($data['assigned_staff_id'])) {
+                if ($user_role !== 'admin') {
+                    sendError('Unauthorized: Only admins can assign staff', 403);
+                }
+
+                $assigned_staff_id = (int)$data['assigned_staff_id'];
+                if ($assigned_staff_id <= 0) {
+                    sendError('Invalid staff selection', 400);
+                }
+
+                $staff_stmt = $this->pdo->prepare("\n                    SELECT id, first_name, last_name\n                    FROM users\n                    WHERE id = ? AND role = 'staff' AND is_active = 1\n                ");
+                $staff_stmt->execute([$assigned_staff_id]);
+                $staff = $staff_stmt->fetch();
+
+                if (!$staff) {
+                    sendError('Selected staff member not found or inactive', 404);
+                }
+
+                $assign_payload = json_encode([
+                    'assigned_by' => $user['user_id'],
+                    'assigned_staff_id' => $assigned_staff_id,
+                    'assigned_staff_name' => trim($staff['first_name'] . ' ' . $staff['last_name']),
+                ]);
+
+                $assign_stmt = $this->pdo->prepare("\n                    INSERT INTO issue_updates (issue_id, user_id, update_type, content)\n                    VALUES (?, ?, 'assigned', ?)\n                ");
+                $assign_stmt->execute([$issue_id, $assigned_staff_id, $assign_payload]);
+
+                Middleware::logAuditTrail(
+                    $user['user_id'],
+                    'ISSUE_ASSIGNED',
+                    'issues',
+                    $issue_id,
+                    null,
+                    [
+                        'assigned_staff_id' => $assigned_staff_id,
+                        'assigned_staff_name' => trim($staff['first_name'] . ' ' . $staff['last_name']),
+                    ]
+                );
+            }
 
             foreach ($allowed_fields as $field) {
                 if (isset($data[$field])) {

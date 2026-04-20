@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <router-link
-              to="/staff/dashboard"
+              :to="backRoute"
               class="flex items-center text-gray-500 hover:text-gray-700"
             >
               <ArrowLeftIcon class="h-5 w-5" />
@@ -47,7 +47,7 @@
             </div>
             <div class="mt-4">
               <router-link
-                to="/staff/dashboard"
+                :to="backRoute"
                 class="text-sm font-medium text-red-800 hover:text-red-900"
                 >Back to Dashboard</router-link
               >
@@ -181,7 +181,100 @@
                   </router-link>
                 </dd>
               </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Assigned Staff</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  {{ issue.assigned_staff_name || 'Not assigned' }}
+                  <span v-if="issue.assigned_staff_email" class="block text-xs text-gray-500">
+                    {{ issue.assigned_staff_email }}
+                  </span>
+                </dd>
+              </div>
             </dl>
+          </div>
+        </div>
+
+        <div v-if="authStore.isAdmin" class="overflow-hidden rounded-lg bg-white shadow">
+          <div class="p-6">
+            <h3 class="text-lg font-medium text-gray-900">Assign to Staff</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Use advanced search and dropdown selection to assign this issue.
+            </p>
+
+            <div class="mt-4 space-y-3">
+              <input
+                v-model="staffSearch"
+                type="text"
+                placeholder="Search by first name, last name, or email"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              />
+
+              <div
+                v-if="filteredStaffOptions.length > 0"
+                class="rounded-md border border-gray-200 bg-white"
+              >
+                <select
+                  v-model="selectedStaffId"
+                  @change="syncSelectedStaffById"
+                  class="max-h-44 w-full rounded-md border-0 px-3 py-2 text-sm focus:outline-none"
+                  size="6"
+                >
+                  <option
+                    v-for="member in filteredStaffOptions"
+                    :key="member.id"
+                    :value="String(member.id)"
+                  >
+                    {{ member.first_name }} {{ member.last_name }} ({{ member.email }})
+                  </option>
+                </select>
+              </div>
+
+              <div
+                v-if="staffSuggestions.length > 0"
+                class="max-h-44 overflow-y-auto rounded-md border border-gray-200"
+              >
+                <div class="border-b border-gray-100 px-3 py-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                  Suggestions
+                </div>
+                <button
+                  v-for="member in staffSuggestions"
+                  :key="member.id"
+                  type="button"
+                  @click="selectStaff(member)"
+                  class="flex w-full items-start justify-between border-b border-gray-100 px-3 py-2 text-left text-sm transition-colors last:border-b-0 hover:bg-gray-50"
+                >
+                  <span>
+                    <span class="font-medium text-gray-900">
+                      {{ member.first_name }} {{ member.last_name }}
+                    </span>
+                    <span class="block text-xs text-gray-500">{{ member.email }}</span>
+                  </span>
+                </button>
+              </div>
+
+              <p
+                v-else-if="staffSearch.trim() && !isSearchingStaff"
+                class="text-xs text-gray-500"
+              >
+                No staff suggestions found.
+              </p>
+
+              <p v-if="isSearchingStaff" class="text-xs text-gray-500">Loading staff list...</p>
+
+              <div v-if="selectedStaff" class="rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-800">
+                Selected: {{ selectedStaff.first_name }} {{ selectedStaff.last_name }}
+                <span class="block text-xs text-blue-600">{{ selectedStaff.email }}</span>
+              </div>
+
+              <button
+                type="button"
+                @click="assignStaff"
+                :disabled="!selectedStaff || isAssigningStaff"
+                class="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {{ isAssigningStaff ? 'Assigning...' : 'Assign Issue' }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -190,11 +283,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useIssuesStore } from '../../stores/issuesStore'
+import { useAuthStore } from '../../stores/authStore'
 import { useToast } from 'vue-toastification'
 import L from 'leaflet'
+import axios from 'axios'
 import {
   ArrowLeftIcon,
   ExclamationCircleIcon,
@@ -207,12 +302,47 @@ import {
 
 const route = useRoute()
 const issuesStore = useIssuesStore()
+const authStore = useAuthStore()
 const toast = useToast()
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/civic-connect/backend/api'
 
 const issue = ref(null)
 const isLoading = ref(false)
 const updatingStatus = ref(null)
 const error = ref('')
+const staffSearch = ref('')
+const allStaff = ref([])
+const selectedStaffId = ref('')
+const selectedStaff = ref(null)
+const isSearchingStaff = ref(false)
+const isAssigningStaff = ref(false)
+
+const backRoute = computed(() => (authStore.isAdmin ? '/admin/issues' : '/staff/dashboard'))
+
+const filteredStaffOptions = computed(() => {
+  if (!staffSearch.value.trim()) {
+    return allStaff.value
+  }
+
+  const query = staffSearch.value.trim().toLowerCase()
+  const tokens = query.split(/\s+/).filter(Boolean)
+
+  return allStaff.value.filter((member) => {
+    const first = (member.first_name || '').toLowerCase()
+    const last = (member.last_name || '').toLowerCase()
+    const email = (member.email || '').toLowerCase()
+    const fullName = `${first} ${last}`.trim()
+
+    return tokens.every(
+      (token) => first.includes(token) || last.includes(token) || fullName.includes(token) || email.includes(token),
+    )
+  })
+})
+
+const staffSuggestions = computed(() => {
+  if (!staffSearch.value.trim()) return []
+  return filteredStaffOptions.value.slice(0, 5)
+})
 
 const availableStatuses = [
   {
@@ -320,7 +450,90 @@ const fetchIssue = async () => {
   }
 }
 
+const fetchAllStaff = async () => {
+  if (!authStore.isAdmin) return
+
+  isSearchingStaff.value = true
+  try {
+    const token = localStorage.getItem('token')
+    const headers = {}
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+
+    let currentPage = 1
+    let totalPages = 1
+    const merged = []
+
+    while (currentPage <= totalPages) {
+      const response = await axios.get(`${API_BASE_URL}/admin/staff`, {
+        headers,
+        params: {
+          page: currentPage,
+          limit: 100,
+        },
+      })
+
+      const staffPage = response.data?.staff || []
+      merged.push(...staffPage)
+      totalPages = response.data?.pagination?.total_pages || 1
+      currentPage += 1
+    }
+
+    allStaff.value = merged
+
+    if (issue.value?.assigned_staff_id) {
+      const assigned = merged.find((member) => String(member.id) === String(issue.value.assigned_staff_id))
+      if (assigned) {
+        selectedStaff.value = assigned
+        selectedStaffId.value = String(assigned.id)
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load staff list:', err)
+    allStaff.value = []
+  } finally {
+    isSearchingStaff.value = false
+  }
+}
+
+const syncSelectedStaffById = () => {
+  if (!selectedStaffId.value) {
+    selectedStaff.value = null
+    return
+  }
+
+  const matched = allStaff.value.find((member) => String(member.id) === selectedStaffId.value)
+  if (matched) {
+    selectedStaff.value = matched
+  }
+}
+
+const selectStaff = (member) => {
+  selectedStaff.value = member
+  selectedStaffId.value = String(member.id)
+}
+
+const assignStaff = async () => {
+  if (!issue.value || !selectedStaff.value) return
+
+  isAssigningStaff.value = true
+  try {
+    await issuesStore.updateIssue(issue.value.id, { assigned_staff_id: selectedStaff.value.id })
+    issue.value = await issuesStore.fetchIssueById(route.params.id)
+    toast.success(
+      `Issue assigned to ${selectedStaff.value.first_name} ${selectedStaff.value.last_name}`,
+    )
+  } catch (err) {
+    console.error(err)
+    toast.error('Failed to assign issue to staff')
+  } finally {
+    isAssigningStaff.value = false
+  }
+}
+
 onMounted(() => {
   fetchIssue()
+  fetchAllStaff()
 })
 </script>

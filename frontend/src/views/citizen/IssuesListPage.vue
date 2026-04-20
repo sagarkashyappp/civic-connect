@@ -257,11 +257,31 @@
       </div>
 
       <!-- Map View -->
-      <div v-if="viewMode === 'map'" class="overflow-hidden rounded-xl bg-white shadow-md">
-        <div v-if="isLoading" class="flex h-96 items-center justify-center">
-          <ArrowPathIcon class="h-8 w-8 animate-spin text-[#75a743]" />
+      <div v-if="viewMode === 'map'" class="space-y-4 rounded-xl bg-white p-4 shadow-md">
+        <div class="flex flex-col gap-2">
+          <button
+            v-if="showLocationButton"
+            @click="requestCurrentLocation"
+            :disabled="isGettingLocation"
+            class="w-fit rounded-lg bg-[#25562e] px-4 py-2 font-semibold text-white transition-colors hover:bg-[#1f4826] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {{ isGettingLocation ? 'Getting your location...' : 'Allow access to current location' }}
+          </button>
+          <p v-if="locationError" class="text-sm text-red-600">{{ locationError }}</p>
         </div>
-        <div id="map-container" v-else class="h-96 md:h-[600px]"></div>
+
+        <div class="overflow-hidden rounded-xl border border-gray-200">
+          <div v-if="isLoading || isGettingLocation" class="flex h-96 items-center justify-center">
+            <ArrowPathIcon class="h-8 w-8 animate-spin text-[#75a743]" />
+          </div>
+          <div v-else-if="hasUserLocation" id="map-container" class="h-96 md:h-[600px]"></div>
+          <div
+            v-else
+            class="flex h-96 items-center justify-center px-4 text-center text-sm text-[#819796] md:h-[600px]"
+          >
+            Allow location access to load your current location on the map.
+          </div>
+        </div>
       </div>
     </div>
 
@@ -271,7 +291,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import L from 'leaflet'
 import { useIssuesStore } from '../../stores/issuesStore'
 import ImageModal from '../../components/common/ImageModal.vue'
@@ -295,8 +315,14 @@ const issuesStore = useIssuesStore()
 const viewMode = ref('list')
 const isLoading = ref(false)
 const selectedImage = ref(null)
+const isGettingLocation = ref(false)
+const locationError = ref('')
+const locationPermissionState = ref('prompt')
+const userLocation = ref(null)
 let mapInstance = null
-let markers = {}
+let userLocationCircle = null
+let issueMarkersLayer = null
+let geolocationWatchId = null
 
 const filters = ref({
   status: '',
@@ -306,6 +332,90 @@ const filters = ref({
 
 const filteredIssuesStore = computed(() => issuesStore.filteredIssues)
 const totalIssuesCount = computed(() => issuesStore.totalCount)
+const showLocationButton = computed(() => locationPermissionState.value !== 'granted')
+const hasUserLocation = computed(() => Boolean(userLocation.value))
+
+const getStatusColor = (status) => {
+  if (status === 'pending_review') return '#3b82f6'
+  if (status === 'in_progress') return '#f59e0b'
+  if (status === 'resolved') return '#22c55e'
+  return '#ef4444'
+}
+
+const escapeHtml = (value) => {
+  if (typeof value !== 'string') return ''
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+const handleMapContainerClick = (e) => {
+  const target = e.target
+  if (!(target instanceof HTMLElement)) return
+
+  if (target.classList.contains('view-details-link')) {
+    e.preventDefault()
+    const issueId = target.getAttribute('data-issue-id')
+    if (issueId) {
+      import('../../router').then(({ default: router }) => {
+        router.push(`/issues/${issueId}`)
+      })
+    }
+  }
+}
+
+const renderIssueMarkers = () => {
+  if (!mapInstance) return
+
+  if (issueMarkersLayer) {
+    issueMarkersLayer.remove()
+  }
+
+  issueMarkersLayer = L.layerGroup()
+
+  filteredIssuesStore.value.forEach((issue) => {
+    if (!issue.latitude || !issue.longitude) return
+
+    const color = getStatusColor(issue.status)
+    const marker = L.circleMarker([issue.latitude, issue.longitude], {
+      radius: 7,
+      color,
+      fillColor: color,
+      fillOpacity: 0.85,
+      weight: 2,
+    })
+
+    const safeTitle = escapeHtml(issue.title || 'Untitled Issue')
+    const safeCategory = escapeHtml(formatCategory(issue.category || 'other'))
+    const safeDescription = escapeHtml(issue.description || '').slice(0, 120)
+
+    marker.bindPopup(`
+      <div class="max-w-xs">
+        <h3 class="font-bold text-[#10141f]">${safeTitle}</h3>
+        <p class="text-xs text-[#819796] mt-1">${safeCategory}</p>
+        <p class="text-sm mt-2 text-[#10141f]">${safeDescription}${safeDescription.length >= 120 ? '...' : ''}</p>
+        <a href="#" class="text-blue-600 text-sm font-semibold mt-2 inline-block view-details-link" data-issue-id="${issue.id}">View Details</a>
+      </div>
+    `)
+
+    marker.addTo(issueMarkersLayer)
+  })
+
+  issueMarkersLayer.addTo(mapInstance)
+}
+
+const destroyMap = () => {
+  if (mapInstance) {
+    mapInstance.getContainer().removeEventListener('click', handleMapContainerClick)
+    mapInstance.remove()
+    mapInstance = null
+  }
+  userLocationCircle = null
+  issueMarkersLayer = null
+}
 
 const formatCategory = (category) => {
   const categoryMap = {
@@ -368,90 +478,108 @@ const toggleUpvote = async (issueId) => {
 }
 
 const initMap = () => {
-  if (mapInstance) {
-    mapInstance.remove()
+  if (!userLocation.value) return
+
+  const mapContainer = document.getElementById('map-container')
+  if (!mapContainer) return
+
+  const { latitude, longitude, accuracy } = userLocation.value
+
+  if (!mapInstance) {
+    mapInstance = L.map('map-container').setView([latitude, longitude], 16)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+      minZoom: 3,
+    }).addTo(mapInstance)
+
+    mapInstance.getContainer().addEventListener('click', handleMapContainerClick)
   }
 
-  // Ludhiana, Punjab coordinates and bounds
-  const ludhianaCenterLat = 30.900965
-  const ludhianaCenterLng = 75.857277
-  const ludhianaBounds = [
-    [30.78, 75.74], // Southwest
-    [31.02, 75.97], // Northeast
-  ]
+  if (userLocationCircle) {
+    userLocationCircle.setLatLng([latitude, longitude])
+    userLocationCircle.setRadius(Math.max(accuracy || 25, 25))
+  } else {
+    userLocationCircle = L.circle([latitude, longitude], {
+      radius: Math.max(accuracy || 25, 25),
+      color: '#2563eb',
+      fillColor: '#3b82f6',
+      fillOpacity: 0.35,
+      weight: 2,
+    }).addTo(mapInstance)
 
-  // Initialize map centered on Ludhiana
-  mapInstance = L.map('map-container').setView([ludhianaCenterLat, ludhianaCenterLng], 13)
-  mapInstance.attributionControl.setPrefix('Ludhiana')
+    userLocationCircle.bindPopup('Your current location').openPopup()
+  }
 
-  // Set max bounds to Ludhiana with some buffer
-  mapInstance.setMaxBounds([
-    [30.76, 75.72],
-    [31.04, 75.99],
-  ])
+  renderIssueMarkers()
+}
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 19,
-    minZoom: 11,
-  }).addTo(mapInstance)
+const stopLocationTracking = () => {
+  if (geolocationWatchId !== null && navigator.geolocation) {
+    navigator.geolocation.clearWatch(geolocationWatchId)
+    geolocationWatchId = null
+  }
+}
 
-  // Handle popup clicks via delegation
-  mapInstance.getContainer().addEventListener('click', (e) => {
-    if (e.target.classList.contains('view-details-link')) {
-      e.preventDefault()
-      const issueId = e.target.getAttribute('data-issue-id')
-      if (issueId) {
-        import('../../router').then(({ default: router }) => {
-          router.push(`/issues/${issueId}`)
-        })
+const checkLocationPermission = async () => {
+  if (!navigator.permissions?.query) {
+    return
+  }
+
+  try {
+    const permissionStatus = await navigator.permissions.query({ name: 'geolocation' })
+    locationPermissionState.value = permissionStatus.state
+    permissionStatus.onchange = () => {
+      locationPermissionState.value = permissionStatus.state
+    }
+  } catch (error) {
+    console.error('Error checking location permission:', error)
+  }
+}
+
+const requestCurrentLocation = async () => {
+  if (!navigator.geolocation) {
+    locationError.value = 'Geolocation is not supported by your browser.'
+    return
+  }
+
+  if (geolocationWatchId !== null) {
+    return
+  }
+
+  isGettingLocation.value = true
+  locationError.value = ''
+
+  geolocationWatchId = navigator.geolocation.watchPosition(
+    async (position) => {
+      const { latitude, longitude, accuracy } = position.coords
+      userLocation.value = { latitude, longitude, accuracy }
+      locationPermissionState.value = 'granted'
+      isGettingLocation.value = false
+      await nextTick()
+      initMap()
+    },
+    (error) => {
+      if (error.code === error.PERMISSION_DENIED) {
+        locationPermissionState.value = 'denied'
+        locationError.value = 'Location access was denied. Please allow it in your browser settings.'
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        locationError.value = 'Your location is currently unavailable.'
+      } else if (error.code === error.TIMEOUT) {
+        locationError.value = 'Location request timed out. Please try again.'
+      } else {
+        locationError.value = 'Could not fetch your location. Please try again.'
       }
-    }
-  })
-
-  // Add a visual bounds rectangle for Ludhiana
-  L.rectangle(ludhianaBounds, {
-    color: '#25562e',
-    weight: 2,
-    opacity: 0.3,
-    fillColor: '#75a743',
-    fillOpacity: 0.05,
-  }).addTo(mapInstance)
-
-  // Add markers for all issues
-  issuesStore.filteredIssues.forEach((issue) => {
-    if (issue.latitude && issue.longitude) {
-      // SVG for map popup thumbs up
-      const thumbsUpSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1 inline-block">
-        <path d="M7.493 18.75c-.425 0-.82-.236-.975-.632A7.48 7.48 0 016 15.375c0-1.75.599-3.358 1.602-4.634.151-.192.373-.309.6-.397.473-.183.89-.514 1.212-.924a9.042 9.042 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.233 18.748c.036.003.072.003.108.003h3.126c.909 0 1.764-.325 2.43-.873a10.45 10.45 0 002.606-6.666c0-.525-.03-1.044-.09-1.554a3.75 3.75 0 00-3.665-3.348h-3.126a2.25 2.25 0 00-1.418.508c-.27.233-.673.34-1.077.34-.378 0-.743-.092-1.077-.282a3.75 3.75 0 00-1.748-.43h-2.25C6.983 7.545 6 9.006 6 10.875v5.85c0 1.056.405 2.06 1.127 2.766.721.705 1.707 1.059 2.723 1.059h5.383z" />
-      </svg>`
-
-      const marker = L.marker([issue.latitude, issue.longitude]).addTo(mapInstance).bindPopup(`
-          <div class="max-w-xs">
-            <h3 class="font-bold">${issue.title}</h3>
-            <p class="text-sm text-gray-600">${issue.category}</p>
-            <p class="text-sm font-semibold text-[#cf573c] mt-1 flex items-center">
-              ${thumbsUpSvg}
-              ${issue.upvote_count || 0} Votes
-            </p>
-            <p class="text-sm mt-2">${issue.description.substring(0, 100)}...</p>
-            <a href="javascript:void(0)" class="text-blue-600 text-sm font-semibold mt-2 inline-block view-details-link" data-issue-id="${issue.id}">View Details →</a>
-          </div>
-        `)
-
-      // Add CSS class based on status for styling
-      const statusClass = `status-${issue.status}`
-      marker.getElement()?.classList.add(statusClass)
-
-      markers[issue.id] = marker
-    }
-  })
-
-  // Fit bounds to show all markers if there are any
-  if (Object.keys(markers).length > 0) {
-    const group = L.featureGroup(Object.values(markers))
-    mapInstance.fitBounds(group.getBounds().pad(0.1))
-  }
+      stopLocationTracking()
+      isGettingLocation.value = false
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    },
+  )
 }
 
 const fetchIssues = async () => {
@@ -469,16 +597,42 @@ const fetchIssues = async () => {
 
 watch(
   () => viewMode.value,
-  (newMode) => {
+  async (newMode) => {
     if (newMode === 'map') {
+      await checkLocationPermission()
+
       setTimeout(() => {
-        initMap()
+        if (hasUserLocation.value) {
+          initMap()
+        }
+
+        if (locationPermissionState.value === 'granted') {
+          requestCurrentLocation()
+        }
       }, 100)
+    } else {
+      stopLocationTracking()
+      destroyMap()
     }
   },
 )
 
+watch(
+  filteredIssuesStore,
+  () => {
+    if (viewMode.value === 'map') {
+      renderIssueMarkers()
+    }
+  },
+  { deep: true },
+)
+
 onMounted(() => {
   fetchIssues()
+})
+
+onUnmounted(() => {
+  stopLocationTracking()
+  destroyMap()
 })
 </script>

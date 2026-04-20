@@ -174,7 +174,7 @@
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                 <router-link
-                  :to="`/staff/issues/${issue.id}`"
+                  :to="`/admin/issues/${issue.id}`"
                   class="text-blue-600 hover:text-blue-900"
                   >Manage</router-link
                 >

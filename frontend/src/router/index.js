@@ -149,6 +149,12 @@ const routes = [
     meta: { guard: 'ADMIN', title: 'Manage Issues' },
   },
   {
+    path: '/admin/issues/:id',
+    name: 'adminIssueDetail',
+    component: () => import('../views/staff/IssueDetailPage.vue'),
+    meta: { guard: 'ADMIN', title: 'Issue Details' },
+  },
+  {
     path: '/admin/audit-logs',
     name: 'adminAuditLogs',
     component: () => import('../views/admin/AuditLogsPage.vue'),
@@ -196,6 +202,18 @@ router.beforeEach((to, from, next) => {
   // Initialize auth from localStorage if not already done
   if (!authStore.user && authStore.token) {
     authStore.initializeAuth()
+  }
+
+  // Keep /dashboard role-aware so admin/staff never land on citizen dashboard.
+  if (to.path === '/dashboard' && authStore.isAuthenticated) {
+    if (authStore.isAdmin) {
+      next('/admin/dashboard')
+      return
+    }
+    if (authStore.isStaff) {
+      next('/staff/dashboard')
+      return
+    }
   }
 
   const guard = to.meta.guard || 'PUBLIC'

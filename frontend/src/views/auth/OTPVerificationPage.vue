@@ -218,7 +218,12 @@ const handleVerifyOTP = async () => {
       toast.success('Authentication successful!')
 
       // Redirect to dashboard or return URL
-      const returnUrl = sessionStorage.getItem('authReturnUrl') || '/dashboard'
+      const defaultDashboard = authStore.isAdmin
+        ? '/admin/dashboard'
+        : authStore.isStaff
+          ? '/staff/dashboard'
+          : '/dashboard'
+      const returnUrl = sessionStorage.getItem('authReturnUrl') || defaultDashboard
       sessionStorage.removeItem('authReturnUrl')
 
       setTimeout(() => {
