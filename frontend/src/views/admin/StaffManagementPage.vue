@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-12">
+  <div class="min-h-screen bg-cream-50 pb-12">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
+    <div class="bg-white shadow-sm border-b border-gold-200/60">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Manage Staff</h1>
-            <p class="mt-1 text-sm text-gray-500">Create and manage staff accounts.</p>
+            <h1 class="text-2xl font-bold text-slate-900">Manage Staff</h1>
+            <p class="mt-1 text-sm text-slate-600">Create and manage staff accounts.</p>
           </div>
           <button
             @click="openAddModal"
-            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            class="inline-flex items-center gap-2 rounded-lg bg-gold-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-700"
           >
             <PlusIcon class="h-5 w-5" />
             Add Staff
@@ -25,23 +25,23 @@
       <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div class="relative w-full max-w-md">
           <MagnifyingGlassIcon
-            class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400"
+            class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gold-400"
           />
           <input
             v-model="searchQuery"
             @input="handleSearch"
             type="text"
             placeholder="Search by name or email..."
-            class="w-full rounded-lg border-gray-300 py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-blue-500"
+            class="w-full rounded-lg border-gold-200 bg-white py-2 pr-4 pl-10 text-sm text-slate-800 focus:border-gold-400 focus:ring-gold-300"
           />
         </div>
       </div>
 
       <!-- Staff Table -->
-      <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+      <div class="overflow-hidden rounded-xl bg-white shadow-sm border border-gold-200/50">
         <div v-if="loading" class="flex h-64 items-center justify-center">
           <div
-            class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+            class="h-8 w-8 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
           ></div>
         </div>
 
@@ -49,64 +49,64 @@
           v-else-if="staff.length === 0"
           class="flex h-64 flex-col items-center justify-center py-12 text-center"
         >
-          <h3 class="mt-2 text-sm font-semibold text-gray-900">No staff found</h3>
-          <p class="mt-1 text-sm text-gray-500">Get started by creating a new staff account.</p>
+          <h3 class="mt-2 text-sm font-semibold text-slate-900">No staff found</h3>
+          <p class="mt-1 text-sm text-slate-600">Get started by creating a new staff account.</p>
         </div>
 
-        <table v-else class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table v-else class="min-w-full divide-y divide-gold-100/70">
+          <thead class="bg-cream-50">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Staff Member
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Status
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Email Verified
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Joined
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Last Login
               </th>
               <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
+          <tbody class="divide-y divide-gold-100/70 bg-white">
             <tr
               v-for="member in staff"
               :key="member.id"
-              class="group transition-colors hover:bg-gray-50"
+              class="group transition-colors hover:bg-gold-50/40"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-600"
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-100 font-semibold text-gold-700"
                   >
                     {{ member.first_name[0] }}{{ member.last_name[0] }}
                   </div>
                   <div class="ml-4">
-                    <div class="font-medium text-gray-900">
+                    <div class="font-medium text-slate-900">
                       {{ member.first_name }} {{ member.last_name }}
                     </div>
-                    <div class="text-sm text-gray-500">{{ member.email }}</div>
+                    <div class="text-sm text-slate-600">{{ member.email }}</div>
                   </div>
                 </div>
               </td>
@@ -126,20 +126,20 @@
                   :class="
                     member.email_verified
                       ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                      : 'bg-saffron-100 text-saffron-800'
                   "
                 >
                   {{ member.email_verified ? 'Verified' : 'Pending' }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ formatDate(member.created_at) }}
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ member.last_login ? formatDate(member.last_login) : 'Never' }}
               </td>
               <td class="space-x-3 px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                <button @click="openEditModal(member)" class="text-blue-600 hover:text-blue-900">
+                <button @click="openEditModal(member)" class="text-gold-700 hover:text-gold-900">
                   Edit
                 </button>
                 <button
@@ -160,27 +160,27 @@
         <!-- Pagination -->
         <div
           v-if="pagination.total_pages > 1"
-          class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+          class="flex items-center justify-between border-t border-gold-200/60 bg-white px-4 py-3 sm:px-6"
         >
           <div class="flex flex-1 justify-between sm:hidden">
             <button
               @click="changePage(pagination.current_page - 1)"
               :disabled="pagination.current_page === 1"
-              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              class="relative inline-flex items-center rounded-md border border-gold-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-50 disabled:opacity-50"
             >
               Previous
             </button>
             <button
               @click="changePage(pagination.current_page + 1)"
               :disabled="pagination.current_page === pagination.total_pages"
-              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              class="relative ml-3 inline-flex items-center rounded-md border border-gold-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-50 disabled:opacity-50"
             >
               Next
             </button>
           </div>
           <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm text-gray-700">
+              <p class="text-sm text-slate-700">
                 Showing
                 <span class="font-medium">{{
                   (pagination.current_page - 1) * pagination.limit + 1
@@ -202,7 +202,7 @@
                 <button
                   @click="changePage(pagination.current_page - 1)"
                   :disabled="pagination.current_page === 1"
-                  class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gold-500 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span class="sr-only">Previous</span>
                   <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
@@ -213,8 +213,8 @@
                   @click="changePage(page)"
                   :class="[
                     page === pagination.current_page
-                      ? 'relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                      : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0',
+                      ? 'relative z-10 inline-flex items-center bg-gold-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-600'
+                      : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0',
                   ]"
                 >
                   {{ page }}
@@ -222,7 +222,7 @@
                 <button
                   @click="changePage(pagination.current_page + 1)"
                   :disabled="pagination.current_page === pagination.total_pages"
-                  class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gold-500 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span class="sr-only">Next</span>
                   <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
@@ -240,16 +240,16 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
     >
       <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <h3 class="text-lg font-semibold text-gray-900">
+        <h3 class="text-lg font-semibold text-slate-900">
           {{ isEditing ? 'Edit Staff Member' : 'Add New Staff Member' }}
         </h3>
-        <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-slate-600">
           {{ isEditing ? 'Update staff member details.' : 'Create a new staff account.' }}
         </p>
 
         <form @submit.prevent="saveStaff" class="mt-6 space-y-4">
           <div>
-            <label for="first_name" class="block text-sm font-medium text-gray-700"
+            <label for="first_name" class="block text-sm font-medium text-slate-700"
               >First Name</label
             >
             <input
@@ -257,43 +257,43 @@
               id="first_name"
               type="text"
               required
-              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              class="mt-1 block w-full rounded-lg border-gold-200 shadow-sm focus:border-gold-400 focus:ring-gold-300"
             />
           </div>
 
           <div>
-            <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <label for="last_name" class="block text-sm font-medium text-slate-700">Last Name</label>
             <input
               v-model="formData.last_name"
               id="last_name"
               type="text"
               required
-              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              class="mt-1 block w-full rounded-lg border-gold-200 shadow-sm focus:border-gold-400 focus:ring-gold-300"
             />
           </div>
 
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
             <input
               v-model="formData.email"
               id="email"
               type="email"
               required
-              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              class="mt-1 block w-full rounded-lg border-gold-200 shadow-sm focus:border-gold-400 focus:ring-gold-300"
             />
           </div>
 
           <div v-if="!isEditing">
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
             <input
               v-model="formData.password"
               id="password"
               type="password"
               required
               minlength="8"
-              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              class="mt-1 block w-full rounded-lg border-gold-200 shadow-sm focus:border-gold-400 focus:ring-gold-300"
             />
-            <p class="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+            <p class="mt-1 text-xs text-slate-600">Minimum 8 characters</p>
           </div>
 
           <div v-if="errorMessage" class="rounded-lg bg-red-50 p-3 text-sm text-red-700">
@@ -304,14 +304,14 @@
             <button
               type="button"
               @click="closeModal"
-              class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-100"
             >
               Cancel
             </button>
             <button
               type="submit"
               :disabled="saving"
-              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              class="rounded-lg bg-gold-600 px-4 py-2 text-sm font-medium text-white hover:bg-gold-700 disabled:opacity-50"
             >
               {{ saving ? 'Saving...' : isEditing ? 'Update Staff' : 'Create Staff' }}
             </button>

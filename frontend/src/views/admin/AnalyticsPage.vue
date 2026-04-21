@@ -1,20 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-12">
+  <div class="min-h-screen bg-cream-50 pb-12">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
+    <div class="bg-white shadow-sm border-b border-gold-200/60">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Analytics & Reports</h1>
-            <p class="mt-1 text-sm text-gray-500">
+            <h1 class="text-2xl font-bold text-slate-900">Analytics & Reports</h1>
+            <p class="mt-1 text-sm text-slate-600">
               Comprehensive system analytics and performance metrics
             </p>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-sm text-gray-500">Last updated: {{ lastUpdated }}</span>
+            <span class="text-sm text-slate-600">Last updated: {{ lastUpdated }}</span>
             <button
               @click="refreshData"
-              class="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+              class="flex items-center gap-2 rounded-lg bg-gold-100 px-4 py-2 text-sm font-medium text-gold-800 transition-colors hover:bg-gold-200"
               :disabled="loading"
             >
               <ArrowPathIcon class="h-4 w-4" :class="{ 'animate-spin': loading }" />
@@ -33,7 +33,7 @@
         class="flex h-96 items-center justify-center"
       >
         <div
-          class="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+          class="h-12 w-12 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
         ></div>
       </div>
 
@@ -43,60 +43,60 @@
         <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <!-- Total Users -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-75 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-75 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
             <div class="flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50">
-                <UsersIcon class="h-6 w-6 text-blue-600" />
+              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gold-100">
+                <UsersIcon class="h-6 w-6 text-gold-700" />
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Total Users</p>
-                <p class="text-2xl font-bold text-gray-900">{{ stats.users_total }}</p>
+                <p class="text-sm font-medium text-slate-600">Total Users</p>
+                <p class="text-2xl font-bold text-slate-900">{{ stats.users_total }}</p>
               </div>
             </div>
           </div>
 
           <!-- Total Issues -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-100 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-100 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
             <div class="flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-50">
-                <ClipboardDocumentListIcon class="h-6 w-6 text-orange-600" />
+              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-saffron-100">
+                <ClipboardDocumentListIcon class="h-6 w-6 text-saffron-600" />
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Total Issues</p>
-                <p class="text-2xl font-bold text-gray-900">{{ stats.issues_total }}</p>
+                <p class="text-sm font-medium text-slate-600">Total Issues</p>
+                <p class="text-2xl font-bold text-slate-900">{{ stats.issues_total }}</p>
               </div>
             </div>
           </div>
 
           <!-- Resolution Rate -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-150 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-150 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
             <div class="flex items-center gap-4">
               <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-50">
-                <ChartBarIcon class="h-6 w-6 text-green-600" />
+                <ChartBarIcon class="h-6 w-6 text-green-700" />
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Resolution Rate</p>
-                <p class="text-2xl font-bold text-gray-900">{{ resolutionRate }}%</p>
+                <p class="text-sm font-medium text-slate-600">Resolution Rate</p>
+                <p class="text-2xl font-bold text-slate-900">{{ resolutionRate }}%</p>
               </div>
             </div>
           </div>
 
           <!-- Active Staff -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-200 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-200 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
             <div class="flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-50">
-                <UserGroupIcon class="h-6 w-6 text-purple-600" />
+              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gold-100">
+                <UserGroupIcon class="h-6 w-6 text-gold-700" />
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Staff Members</p>
-                <p class="text-2xl font-bold text-gray-900">
+                <p class="text-sm font-medium text-slate-600">Staff Members</p>
+                <p class="text-2xl font-bold text-slate-900">
                   {{ stats.users_by_role?.staff || 0 }}
                 </p>
               </div>
@@ -108,23 +108,23 @@
         <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <!-- Issues by Status Chart -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-300 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-300 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">Issues by Status</h3>
+            <h3 class="mb-4 text-lg font-semibold text-slate-900">Issues by Status</h3>
             <div class="flex items-center justify-center" style="height: 300px">
               <Doughnut v-if="statusChartData" :data="statusChartData" :options="doughnutOptions" />
-              <p v-else class="text-sm text-gray-500">No data available</p>
+              <p v-else class="text-sm text-slate-600">No data available</p>
             </div>
           </div>
 
           <!-- Users by Role Chart -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-400 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-400 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">Users by Role</h3>
+            <h3 class="mb-4 text-lg font-semibold text-slate-900">Users by Role</h3>
             <div class="flex items-center justify-center" style="height: 300px">
               <Pie v-if="userRoleChartData" :data="userRoleChartData" :options="pieOptions" />
-              <p v-else class="text-sm text-gray-500">No data available</p>
+              <p v-else class="text-sm text-slate-600">No data available</p>
             </div>
           </div>
         </div>
@@ -133,39 +133,39 @@
         <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <!-- Issues by Category Chart -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-500 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-500 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">Issues by Category</h3>
+            <h3 class="mb-4 text-lg font-semibold text-slate-900">Issues by Category</h3>
             <div class="flex items-center justify-center" style="height: 300px">
               <Bar v-if="categoryChartData" :data="categoryChartData" :options="barOptions" />
-              <p v-else class="text-sm text-gray-500">No data available</p>
+              <p v-else class="text-sm text-slate-600">No data available</p>
             </div>
           </div>
 
           <!-- Issues by Priority Chart -->
           <div
-            class="motion-preset-slide-up-sm motion-delay-600 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+            class="motion-preset-slide-up-sm motion-delay-600 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
           >
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">Issues by Priority</h3>
+            <h3 class="mb-4 text-lg font-semibold text-slate-900">Issues by Priority</h3>
             <div class="flex items-center justify-center" style="height: 300px">
               <Doughnut
                 v-if="priorityChartData"
                 :data="priorityChartData"
                 :options="doughnutOptions"
               />
-              <p v-else class="text-sm text-gray-500">No data available</p>
+              <p v-else class="text-sm text-slate-600">No data available</p>
             </div>
           </div>
         </div>
 
         <!-- Issues Timeline Chart - Full Width -->
         <div
-          class="motion-preset-slide-up-sm motion-delay-700 overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5"
+          class="motion-preset-slide-up-sm motion-delay-700 overflow-hidden rounded-xl bg-white p-6 shadow-sm border border-gold-200/50"
         >
-          <h3 class="mb-4 text-lg font-semibold text-gray-900">Issues Timeline (Last 30 Days)</h3>
+          <h3 class="mb-4 text-lg font-semibold text-slate-900">Issues Timeline (Last 30 Days)</h3>
           <div class="flex items-center justify-center" style="height: 300px">
             <Line v-if="timelineChartData" :data="timelineChartData" :options="lineOptions" />
-            <p v-else class="text-sm text-gray-500">No data available</p>
+            <p v-else class="text-sm text-slate-600">No data available</p>
           </div>
         </div>
       </div>
@@ -252,11 +252,11 @@ const statusChartData = computed(() => {
       {
         data: [statusCounts.pending_review, statusCounts.in_progress, statusCounts.resolved],
         backgroundColor: [
-          'rgba(234, 179, 8, 0.8)',
-          'rgba(99, 102, 241, 0.8)',
+          'rgba(212, 175, 55, 0.82)',
+          'rgba(255, 153, 51, 0.82)',
           'rgba(34, 197, 94, 0.8)',
         ],
-        borderColor: ['rgba(234, 179, 8, 1)', 'rgba(99, 102, 241, 1)', 'rgba(34, 197, 94, 1)'],
+        borderColor: ['rgba(212, 175, 55, 1)', 'rgba(255, 153, 51, 1)', 'rgba(34, 197, 94, 1)'],
         borderWidth: 2,
       },
     ],
@@ -277,11 +277,11 @@ const userRoleChartData = computed(() => {
       {
         data,
         backgroundColor: [
-          'rgba(59, 130, 246, 0.8)', // Blue for citizen
-          'rgba(168, 85, 247, 0.8)', // Purple for staff
-          'rgba(239, 68, 68, 0.8)', // Red for admin
+          'rgba(212, 175, 55, 0.82)',
+          'rgba(255, 153, 51, 0.82)',
+          'rgba(13, 61, 86, 0.82)',
         ],
-        borderColor: ['rgba(59, 130, 246, 1)', 'rgba(168, 85, 247, 1)', 'rgba(239, 68, 68, 1)'],
+        borderColor: ['rgba(212, 175, 55, 1)', 'rgba(255, 153, 51, 1)', 'rgba(13, 61, 86, 1)'],
         borderWidth: 2,
       },
     ],
@@ -320,8 +320,8 @@ const categoryChartData = computed(() => {
       {
         label: 'Number of Issues',
         data,
-        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(212, 175, 55, 0.85)',
+        borderColor: 'rgba(212, 175, 55, 1)',
         borderWidth: 2,
       },
     ],
@@ -345,11 +345,11 @@ const priorityChartData = computed(() => {
       {
         data: [priorityCounts.low, priorityCounts.medium, priorityCounts.high],
         backgroundColor: [
-          'rgba(34, 197, 94, 0.8)', // Green for low
-          'rgba(234, 179, 8, 0.8)', // Yellow for medium
-          'rgba(249, 115, 22, 0.8)', // Orange for high
+          'rgba(34, 197, 94, 0.8)',
+          'rgba(212, 175, 55, 0.82)',
+          'rgba(255, 153, 51, 0.85)',
         ],
-        borderColor: ['rgba(34, 197, 94, 1)', 'rgba(234, 179, 8, 1)', 'rgba(249, 115, 22, 1)'],
+        borderColor: ['rgba(34, 197, 94, 1)', 'rgba(212, 175, 55, 1)', 'rgba(255, 153, 51, 1)'],
         borderWidth: 2,
       },
     ],
@@ -386,13 +386,13 @@ const timelineChartData = computed(() => {
         label: 'Issues Created',
         data: counts,
         fill: true,
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(212, 175, 55, 0.14)',
+        borderColor: 'rgba(212, 175, 55, 1)',
         borderWidth: 2,
         tension: 0.4,
         pointRadius: 3,
         pointHoverRadius: 5,
-        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+        pointBackgroundColor: 'rgba(212, 175, 55, 1)',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
       },

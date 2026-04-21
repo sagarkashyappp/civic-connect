@@ -249,7 +249,7 @@ const loading = ref(true)
 const dashboardRoute = computed(() => {
   if (authStore.isAdmin) return '/admin/dashboard'
   if (authStore.isStaff) return '/staff/dashboard'
-  return '/citizen/dashboard'
+  return '/dashboard'
 })
 
 const fetchStats = async () => {

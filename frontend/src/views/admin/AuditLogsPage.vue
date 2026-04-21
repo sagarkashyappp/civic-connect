@@ -1,84 +1,84 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-12">
+  <div class="min-h-screen bg-cream-50 pb-12">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
+    <div class="bg-white shadow-sm border-b border-gold-200/60">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold text-gray-900">Audit Logs</h1>
-        <p class="mt-1 text-sm text-gray-500">Track system activity and user actions.</p>
+        <h1 class="text-2xl font-bold text-slate-900">Audit Logs</h1>
+        <p class="mt-1 text-sm text-slate-600">Track system activity and user actions.</p>
       </div>
     </div>
 
     <!-- Main Content -->
     <div class="mx-auto mt-8 max-w-7xl px-4 sm:px-6 lg:px-8">
       <!-- Logs Table -->
-      <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+      <div class="overflow-hidden rounded-xl bg-white shadow-sm border border-gold-200/50">
         <div v-if="loading" class="flex h-64 items-center justify-center">
           <div
-            class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+            class="h-8 w-8 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
           ></div>
         </div>
 
-        <table v-else class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table v-else class="min-w-full divide-y divide-gold-100/70">
+          <thead class="bg-cream-50">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Timestamp
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Action
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 User
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Entity
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Details
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <tr v-for="log in logs" :key="log.id" class="group transition-colors hover:bg-gray-50">
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+          <tbody class="divide-y divide-gold-100/70 bg-white">
+            <tr v-for="log in logs" :key="log.id" class="group transition-colors hover:bg-gold-50/40">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ formatDate(log.created_at) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
-                  class="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-0.5 font-mono text-xs font-medium text-gray-800"
+                  class="inline-flex items-center rounded-md bg-gold-100 px-2.5 py-0.5 font-mono text-xs font-medium text-gold-800"
                 >
                   {{ log.action }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div v-if="log.user_id" class="text-sm">
-                  <div class="font-medium text-gray-900">
+                  <div class="font-medium text-slate-900">
                     {{ log.first_name }} {{ log.last_name }}
                   </div>
-                  <div class="text-gray-500">{{ log.user_email }}</div>
+                  <div class="text-slate-600">{{ log.user_email }}</div>
                 </div>
-                <div v-else class="text-sm text-gray-400">System</div>
+                <div v-else class="text-sm text-slate-500">System</div>
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ log.entity_type }} #{{ log.entity_id }}
               </td>
               <td
-                class="max-w-xs truncate px-6 py-4 text-sm text-gray-500"
+                class="max-w-xs truncate px-6 py-4 text-sm text-slate-600"
                 :title="formatDetails(log)"
               >
                 {{ formatDetails(log) }}
@@ -90,27 +90,27 @@
         <!-- Pagination -->
         <div
           v-if="pagination.total_pages > 1"
-          class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+          class="flex items-center justify-between border-t border-gold-200/60 bg-white px-4 py-3 sm:px-6"
         >
           <div class="flex flex-1 justify-between sm:hidden">
             <button
               @click="changePage(pagination.current_page - 1)"
               :disabled="pagination.current_page === 1"
-              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              class="relative inline-flex items-center rounded-md border border-gold-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-50 disabled:opacity-50"
             >
               Previous
             </button>
             <button
               @click="changePage(pagination.current_page + 1)"
               :disabled="pagination.current_page === pagination.total_pages"
-              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              class="relative ml-3 inline-flex items-center rounded-md border border-gold-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-50 disabled:opacity-50"
             >
               Next
             </button>
           </div>
           <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm text-gray-700">
+              <p class="text-sm text-slate-700">
                 Showing
                 <span class="font-medium">{{
                   (pagination.current_page - 1) * pagination.limit + 1
@@ -132,20 +132,20 @@
                 <button
                   @click="changePage(pagination.current_page - 1)"
                   :disabled="pagination.current_page === 1"
-                  class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gold-500 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span class="sr-only">Previous</span>
                   <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
                 </button>
                 <div
-                  class="border-t border-b border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+                  class="border-t border-b border-gold-200 px-4 py-2 text-sm font-medium text-slate-700"
                 >
                   Page {{ pagination.current_page }} of {{ pagination.total_pages }}
                 </div>
                 <button
                   @click="changePage(pagination.current_page + 1)"
                   :disabled="pagination.current_page === pagination.total_pages"
-                  class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gold-500 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span class="sr-only">Next</span>
                   <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />

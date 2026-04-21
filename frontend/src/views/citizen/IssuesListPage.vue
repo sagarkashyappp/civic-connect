@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-linear-to-br from-[#ebede9] to-gray-100">
-    <div class="mx-auto max-w-7xl px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-cream-50 to-cream-100 text-slate-800">
+    <div class="w-full px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
       <!-- Header -->
       <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="mb-2 text-4xl font-bold text-[#10141f]">Community Issues</h1>
-          <p class="text-[#819796]">Browse and upvote issues in your community</p>
+          <h1 class="mb-2 text-4xl font-bold text-slate-900">Community Issues</h1>
+          <p class="text-slate-600">Browse and upvote issues in your community</p>
         </div>
         <router-link
           to="/report-issue"
-          class="flex items-center gap-2 rounded-lg bg-[#cf573c] px-6 py-3 font-semibold text-white shadow-md transition-all hover:bg-[#b84a31] hover:shadow-lg"
+          class="flex items-center gap-2 rounded-lg bg-gold-600 px-6 py-3 font-semibold text-white shadow-md transition-all hover:bg-gold-700 hover:shadow-lg"
         >
           <PlusIcon class="h-5 w-5" />
           Report Issue
@@ -17,15 +17,15 @@
       </div>
 
       <!-- View Toggle and Filters -->
-      <div class="mb-8 rounded-xl bg-white p-6 shadow-md">
+      <div class="mb-8 rounded-xl bg-white/90 p-6 shadow-md backdrop-blur-sm border border-gold-200/50">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <!-- View Toggle -->
           <div class="flex gap-2">
             <button
               @click="viewMode = 'list'"
               :class="{
-                'bg-[#25562e] text-white': viewMode === 'list',
-                'bg-gray-200 text-[#10141f]': viewMode !== 'list',
+                'bg-gold-600 text-white': viewMode === 'list',
+                'bg-gold-100/60 text-gold-700': viewMode !== 'list',
               }"
               class="flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors"
             >
@@ -35,8 +35,8 @@
             <button
               @click="viewMode = 'map'"
               :class="{
-                'bg-[#25562e] text-white': viewMode === 'map',
-                'bg-gray-200 text-[#10141f]': viewMode !== 'map',
+                'bg-gold-600 text-white': viewMode === 'map',
+                'bg-gold-100/60 text-gold-700': viewMode !== 'map',
               }"
               class="flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors"
             >
@@ -51,7 +51,7 @@
             <select
               v-model="filters.status"
               @change="applyFilters"
-              class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#25562e] focus:outline-none"
+              class="rounded-lg border border-gold-200 px-4 py-2 focus:ring-2 focus:ring-gold-500 focus:outline-none bg-cream-50"
             >
               <option value="">All Status</option>
               <option value="pending_review">Pending Review</option>
@@ -63,7 +63,7 @@
             <select
               v-model="filters.category"
               @change="applyFilters"
-              class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#25562e] focus:outline-none"
+              class="rounded-lg border border-gold-200 px-4 py-2 focus:ring-2 focus:ring-gold-500 focus:outline-none bg-cream-50"
             >
               <option value="">All Categories</option>
               <option
@@ -79,7 +79,7 @@
             <select
               v-model="filters.sortBy"
               @change="applyFilters"
-              class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-[#25562e] focus:outline-none"
+              class="rounded-lg border border-gold-200 px-4 py-2 focus:ring-2 focus:ring-gold-500 focus:outline-none bg-cream-50"
             >
               <option value="recent">Most Recent</option>
               <option value="upvotes">Most Upvoted</option>
@@ -88,7 +88,7 @@
             <!-- Reset Filters -->
             <button
               @click="resetAllFilters"
-              class="flex items-center rounded-lg bg-gray-200 px-4 py-2 font-semibold text-[#10141f] transition-colors hover:bg-gray-300"
+              class="flex items-center rounded-lg bg-gold-100 px-4 py-2 font-semibold text-gold-700 transition-colors hover:bg-gold-200"
             >
               <ArrowPathIcon class="mr-2 h-5 w-5" />
               Reset
@@ -101,20 +101,20 @@
       <div v-if="viewMode === 'list'" class="space-y-4">
         <!-- Loading State -->
         <div v-if="isLoading" class="flex flex-col items-center py-12 text-center">
-          <ArrowPathIcon class="h-8 w-8 animate-spin text-[#75a743]" />
-          <p class="mt-4 text-[#819796]">Loading issues...</p>
+          <ArrowPathIcon class="h-8 w-8 animate-spin text-gold-600" />
+          <p class="mt-4 text-slate-600">Loading issues...</p>
         </div>
 
         <!-- Empty State -->
         <div
           v-else-if="filteredIssuesStore.length === 0"
-          class="flex flex-col items-center rounded-xl bg-white p-12 text-center shadow-md"
+          class="flex flex-col items-center rounded-xl bg-white/90 p-12 text-center shadow-md border border-gold-200/50"
         >
-          <InboxIcon class="mb-4 block h-12 w-12 text-[#819796] opacity-50" />
-          <p class="text-lg text-[#819796]">No issues found matching your filters.</p>
+          <InboxIcon class="mb-4 block h-12 w-12 text-gold-600/60 opacity-50" />
+          <p class="text-lg text-slate-600">No issues found matching your filters.</p>
           <button
             @click="resetAllFilters"
-            class="mt-4 font-semibold text-[#75a743] hover:underline"
+            class="mt-4 font-semibold text-gold-700 hover:underline"
           >
             Clear filters
           </button>
@@ -125,10 +125,10 @@
           <div
             v-for="issue in filteredIssuesStore"
             :key="issue.id"
-            class="rounded-xl border-l-4 bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+            class="rounded-xl border-l-4 bg-white/90 p-6 shadow-md transition-shadow hover:shadow-lg backdrop-blur-sm"
             :class="{
-              'border-blue-500': issue.status === 'pending_review',
-              'border-yellow-500': issue.status === 'in_progress',
+              'border-gold-400': issue.status === 'pending_review',
+              'border-saffron-500': issue.status === 'in_progress',
               'border-green-500': issue.status === 'resolved',
             }"
           >
@@ -139,13 +139,11 @@
                 class="h-32 w-full shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-90 lg:w-32"
                 @click="selectedImage = issue.image_url"
               >
-                <img :src="issue.image_url" :alt="issue.title" class="h-full w-full object-cover" />
-              </div>
-              <div
-                v-else
-                class="flex h-32 w-full shrink-0 items-center justify-center rounded-lg bg-gray-200 lg:w-32"
-              >
-                <PhotoIcon class="h-8 w-8 text-gray-400" />
+                <img
+                  :src="issue.image_url"
+                  :alt="issue.title"
+                  class="h-full w-full object-cover"
+                />
               </div>
 
               <!-- Issue Details -->
@@ -154,7 +152,7 @@
                   <div>
                     <router-link
                       :to="`/issues/${issue.id}`"
-                      class="text-xl font-bold text-[#25562e] transition-colors hover:text-[#75a743]"
+                      class="text-xl font-bold text-slate-900 transition-colors hover:text-gold-800"
                     >
                       {{ issue.title }}
                     </router-link>
@@ -162,8 +160,8 @@
                   <!-- Status Badge -->
                   <div
                     :class="{
-                      'bg-blue-100 text-blue-800': issue.status === 'pending_review',
-                      'bg-yellow-100 text-yellow-800': issue.status === 'in_progress',
+                      'bg-gold-100 text-gold-800': issue.status === 'pending_review',
+                      'bg-saffron-100 text-saffron-800': issue.status === 'in_progress',
                       'bg-green-100 text-green-800': issue.status === 'resolved',
                     }"
                     class="rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap uppercase"
@@ -173,25 +171,25 @@
                 </div>
 
                 <!-- Category and Meta -->
-                <div class="mb-3 flex flex-wrap items-center gap-3 text-sm text-[#819796]">
+                <div class="mb-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
                   <span class="flex items-center">
-                    <TagIcon class="mr-1 h-4 w-4 text-[#75a743]" />
+                    <TagIcon class="mr-1 h-4 w-4 text-gold-600" />
                     {{ formatCategory(issue.category) }}
                   </span>
                   <span class="flex items-center">
-                    <CalendarIcon class="mr-1 h-4 w-4 text-[#75a743]" />
+                    <CalendarIcon class="mr-1 h-4 w-4 text-gold-600" />
                     {{ formatDate(issue.created_at) }}
                   </span>
                   <span v-if="issue.location" class="flex max-w-xs items-center truncate">
-                    <MapPinIcon class="mr-1 h-4 w-4 shrink-0 text-[#75a743]" />
+                    <MapPinIcon class="mr-1 h-4 w-4 shrink-0 text-gold-600" />
                     <span class="truncate">{{ issue.location }}</span>
                   </span>
                   <span
                     class="flex items-center"
                     :class="{
-                      'text-orange-600': issue.priority === 'high',
-                      'text-yellow-600': issue.priority === 'medium',
-                      'text-blue-600': issue.priority === 'low',
+                      'text-saffron-600': issue.priority === 'high',
+                      'text-gold-600': issue.priority === 'medium',
+                      'text-slate-600': issue.priority === 'low',
                     }"
                   >
                     <ExclamationCircleIcon class="mr-1 h-4 w-4" />
@@ -200,18 +198,28 @@
                 </div>
 
                 <!-- Description -->
-                <p class="mb-3 line-clamp-2 text-[#10141f]">{{ issue.description }}</p>
+                <p class="mb-3 line-clamp-2 text-slate-700">{{ issue.description }}</p>
 
                 <!-- Reporter -->
-                <p class="mb-3 flex items-center text-xs text-[#819796]">
+                <p class="mb-2 flex items-center text-xs text-slate-600">
                   <UserCircleIcon class="mr-1 h-4 w-4" />
                   Reported by
                   <router-link
                     :to="`/profile/${issue.user_id}`"
-                    class="ml-1 font-semibold text-[#25562e] transition-colors hover:text-[#75a743] hover:underline"
+                    class="ml-1 font-semibold text-slate-900 transition-colors hover:text-gold-800 hover:underline"
                   >
                     {{ issue.user_name }}
                   </router-link>
+                </p>
+
+                <!-- Assigned To -->
+                <p v-if="issue.assigned_staff_id" class="mb-3 flex items-center text-xs text-slate-600">
+                  <UsersIcon class="mr-1 h-4 w-4 text-gold-600" />
+                  <span class="font-semibold text-slate-900">Assigned to:</span>
+                  <span class="ml-1 flex flex-col">
+                    <span class="font-semibold text-gold-700">{{ issue.assigned_staff_first_name }} {{ issue.assigned_staff_last_name }}</span>
+                    <span class="text-[0.65rem] text-slate-600">{{ issue.assigned_staff_email }}</span>
+                  </span>
                 </p>
               </div>
 
@@ -223,8 +231,8 @@
                     <button
                       @click="toggleUpvote(issue.id)"
                       :class="{
-                        'bg-[#cf573c] text-white': issue.user_has_upvoted,
-                        'bg-gray-200 text-[#10141f] hover:bg-[#cf573c] hover:text-white':
+                        'bg-gold-600 text-white': issue.user_has_upvoted,
+                        'bg-gold-100/70 text-gold-700 hover:bg-gold-600 hover:text-white':
                           !issue.user_has_upvoted,
                       }"
                       class="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 font-semibold transition-colors"
@@ -238,7 +246,7 @@
                 <!-- View Details Link -->
                 <router-link
                   :to="`/issues/${issue.id}`"
-                  class="w-full rounded-lg bg-[#25562e] px-4 py-2 text-center font-semibold text-white transition-colors hover:bg-[#1a3d21]"
+                  class="w-full rounded-lg bg-slate-700 px-4 py-2 text-center font-semibold text-cream-50 transition-colors hover:bg-slate-800"
                 >
                   View Details
                 </router-link>
@@ -249,7 +257,7 @@
 
         <!-- Pagination -->
         <div v-if="filteredIssuesStore.length > 0" class="mt-8 flex items-center justify-between">
-          <p class="text-[#819796]">
+          <p class="text-slate-600">
             Showing <strong>{{ filteredIssuesStore.length }}</strong> of
             <strong>{{ totalIssuesCount }}</strong> issues
           </p>
@@ -257,27 +265,27 @@
       </div>
 
       <!-- Map View -->
-      <div v-if="viewMode === 'map'" class="space-y-4 rounded-xl bg-white p-4 shadow-md">
+      <div v-if="viewMode === 'map'" class="space-y-4 rounded-xl bg-white/90 p-4 shadow-md backdrop-blur-sm border border-gold-200/50">
         <div class="flex flex-col gap-2">
           <button
             v-if="showLocationButton"
             @click="requestCurrentLocation"
             :disabled="isGettingLocation"
-            class="w-fit rounded-lg bg-[#25562e] px-4 py-2 font-semibold text-white transition-colors hover:bg-[#1f4826] disabled:cursor-not-allowed disabled:opacity-70"
+            class="w-fit rounded-lg bg-gold-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-gold-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {{ isGettingLocation ? 'Getting your location...' : 'Allow access to current location' }}
           </button>
           <p v-if="locationError" class="text-sm text-red-600">{{ locationError }}</p>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200">
+        <div class="overflow-hidden rounded-xl border border-gold-200">
           <div v-if="isLoading || isGettingLocation" class="flex h-96 items-center justify-center">
-            <ArrowPathIcon class="h-8 w-8 animate-spin text-[#75a743]" />
+            <ArrowPathIcon class="h-8 w-8 animate-spin text-gold-600" />
           </div>
           <div v-else-if="hasUserLocation" id="map-container" class="h-96 md:h-[600px]"></div>
           <div
             v-else
-            class="flex h-96 items-center justify-center px-4 text-center text-sm text-[#819796] md:h-[600px]"
+            class="flex h-96 items-center justify-center px-4 text-center text-sm text-slate-600 md:h-[600px]"
           >
             Allow location access to load your current location on the map.
           </div>
@@ -305,6 +313,7 @@ import {
   CalendarIcon,
   ExclamationCircleIcon,
   UserCircleIcon,
+  UsersIcon,
   HandThumbUpIcon,
   MapPinIcon,
   PlusIcon,
@@ -336,8 +345,8 @@ const showLocationButton = computed(() => locationPermissionState.value !== 'gra
 const hasUserLocation = computed(() => Boolean(userLocation.value))
 
 const getStatusColor = (status) => {
-  if (status === 'pending_review') return '#3b82f6'
-  if (status === 'in_progress') return '#f59e0b'
+  if (status === 'pending_review') return '#d4af37'
+  if (status === 'in_progress') return '#ff9933'
   if (status === 'resolved') return '#22c55e'
   return '#ef4444'
 }
@@ -394,10 +403,10 @@ const renderIssueMarkers = () => {
 
     marker.bindPopup(`
       <div class="max-w-xs">
-        <h3 class="font-bold text-[#10141f]">${safeTitle}</h3>
-        <p class="text-xs text-[#819796] mt-1">${safeCategory}</p>
-        <p class="text-sm mt-2 text-[#10141f]">${safeDescription}${safeDescription.length >= 120 ? '...' : ''}</p>
-        <a href="#" class="text-blue-600 text-sm font-semibold mt-2 inline-block view-details-link" data-issue-id="${issue.id}">View Details</a>
+        <h3 class="font-bold text-slate-900">${safeTitle}</h3>
+        <p class="text-xs text-gold-600 mt-1">${safeCategory}</p>
+        <p class="text-sm mt-2 text-slate-700">${safeDescription}${safeDescription.length >= 120 ? '...' : ''}</p>
+        <a href="#" class="text-gold-600 text-sm font-semibold mt-2 inline-block view-details-link" data-issue-id="${issue.id}">View Details</a>
       </div>
     `)
 

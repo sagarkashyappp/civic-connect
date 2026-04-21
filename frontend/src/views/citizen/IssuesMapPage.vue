@@ -1,7 +1,7 @@
 <template>
   <div class="animate-fade-in-up mx-auto max-w-full px-0 py-0">
     <!-- Header -->
-    <div class="border-b border-gray-100 bg-white px-4 py-4 shadow-sm md:px-6">
+    <div class="border-b border-gold-200 bg-white px-4 py-4 shadow-sm md:px-6">
       <router-link
         to="/issues"
         class="text-text-light hover:text-primary group mb-3 inline-flex items-center gap-2 font-medium transition-colors"
@@ -41,7 +41,7 @@
     <!-- Main Content -->
     <div v-if="hasLocationPermission" class="flex h-[calc(100vh-180px)] gap-0">
       <!-- Map Section -->
-      <div class="flex-1 bg-gray-100">
+      <div class="flex-1 bg-cream-100">
         <div class="relative h-full w-full">
           <div class="absolute left-11 top-3 z-[1000] flex gap-2 rounded-lg bg-white/95 p-2 shadow-md">
             <button
@@ -50,7 +50,7 @@
               :class="
                 mapEngine === 'leaflet'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-cream-100 text-slate-700 hover:bg-cream-200'
               "
               @click="mapEngine = 'leaflet'"
             >
@@ -62,7 +62,7 @@
               :class="
                 mapEngine === 'openlayers'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-cream-100 text-slate-700 hover:bg-cream-200'
               "
               @click="mapEngine = 'openlayers'"
             >
@@ -71,7 +71,7 @@
             <button
               type="button"
               class="rounded-md px-3 py-1 text-xs font-semibold transition-colors"
-              :class="isHeatmapVisible ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'"
+              :class="isHeatmapVisible ? 'bg-gold-100 text-gold-700' : 'bg-slate-100 text-slate-700'"
               @click="toggleHeatmapVisibility"
             >
               Heatmap: {{ isHeatmapVisible ? 'ON' : 'OFF' }}
@@ -79,7 +79,7 @@
             <select
               v-if="mapEngine === 'openlayers'"
               v-model="openLayersBaseStyle"
-              class="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-gray-700 outline-none"
+              class="rounded-md border border-gold-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none"
               title="OpenLayers basemap style"
             >
               <option value="satellite">Satellite (Esri World Imagery)</option>
@@ -87,7 +87,7 @@
             </select>
             <span
               v-if="mapEngine === 'openlayers' && isBasemapTransitioning"
-              class="rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700"
+              class="rounded-md bg-gold-50 px-2 py-1 text-xs font-semibold text-gold-700"
             >
               Switching basemap...
             </span>
@@ -99,9 +99,9 @@
       </div>
 
       <!-- Sidebar: Issue List & Stats -->
-      <div class="w-96 overflow-hidden border-l border-gray-200 bg-white flex flex-col">
+      <div class="w-96 overflow-hidden border-l border-gold-200 bg-white flex flex-col">
         <!-- Controls -->
-        <div class="border-b border-gray-200 p-4">
+        <div class="border-b border-gold-200 p-4">
           <div class="mb-3">
             <label class="text-text mb-1 block text-xs font-medium">View Mode</label>
             <div class="flex gap-2">
@@ -111,7 +111,7 @@
                 :class="
                   viewMode === 'list'
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-cream-100 text-slate-700 hover:bg-cream-200'
                 "
               >
                 List
@@ -122,7 +122,7 @@
                 :class="
                   viewMode === 'nearby'
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-cream-100 text-slate-700 hover:bg-cream-200'
                 "
               >
                 Nearby
@@ -133,7 +133,7 @@
                 :class="
                   viewMode === 'stats'
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-cream-100 text-slate-700 hover:bg-cream-200'
                 "
               >
                 Stats
@@ -146,7 +146,7 @@
             v-model="searchQuery"
             type="text"
             placeholder="Search issues..."
-            class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border-gray-200 bg-gray-50 px-3 py-2 text-xs outline-none focus:bg-white focus:ring-2"
+            class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border-gold-200 bg-cream-50 px-3 py-2 text-xs outline-none focus:bg-white focus:ring-2"
           />
         </div>
 
@@ -161,14 +161,14 @@
               v-for="issue in filteredIssues"
               :key="issue.id"
               @click="focusIssueOnMap(issue)"
-              class="hover:bg-primary-light/20 w-full border-l-4 border-gray-200 bg-gray-50 p-3 text-left transition-all"
-              :class="selectedIssue?.id === issue.id ? 'border-primary bg-blue-50' : ''"
+              class="hover:bg-primary-light/20 w-full border-l-4 border-gold-200 bg-cream-50 p-3 text-left transition-all"
+              :class="selectedIssue?.id === issue.id ? 'border-gold-400 bg-gold-50' : ''"
             >
               <p class="text-text mb-1 line-clamp-1 font-semibold text-xs">{{ issue.title }}</p>
               <p class="text-text-light mb-2 line-clamp-1 text-xs">{{ issue.location }}</p>
               <div class="flex items-center justify-between gap-2">
                 <span
-                  class="inline-block rounded-full bg-gray-200 px-2 py-1 text-xs text-gray-700 capitalize"
+                  class="inline-block rounded-full bg-cream-200 px-2 py-1 text-xs text-slate-700 capitalize"
                   >{{ issue.category.replace(/_/g, ' ') }}</span
                 >
                 <span
@@ -191,13 +191,13 @@
               v-for="issue in nearbyIssues"
               :key="issue.id"
               @click="focusIssueOnMap(issue)"
-              class="hover:bg-primary-light/20 w-full border-l-4 border-blue-400 bg-blue-50 p-3 text-left transition-all"
+              class="hover:bg-primary-light/20 w-full border-l-4 border-gold-400 bg-gold-50 p-3 text-left transition-all"
             >
               <p class="text-text mb-1 line-clamp-1 font-semibold text-xs">{{ issue.title }}</p>
               <p class="text-text-light mb-2 line-clamp-1 text-xs">{{ issue.location }}</p>
               <div class="flex items-center justify-between gap-2">
                 <span
-                  class="inline-block rounded-full bg-blue-200 px-2 py-1 text-xs text-blue-700 capitalize"
+                  class="inline-block rounded-full bg-gold-200 px-2 py-1 text-xs text-gold-700 capitalize"
                   >{{ issue.category.replace(/_/g, ' ') }}</span
                 >
                 <span class="text-primary text-xs font-semibold">
@@ -210,11 +210,11 @@
           <!-- Stats View -->
           <div v-else-if="viewMode === 'stats'" class="p-4">
             <div class="mb-4 space-y-2">
-              <div class="rounded-lg bg-gray-50 p-3">
+              <div class="rounded-lg bg-cream-50 p-3">
                 <p class="text-text-light text-xs">Total Issues</p>
                 <p class="text-text text-xl font-bold">{{ allIssues.length }}</p>
               </div>
-              <div class="rounded-lg bg-blue-50 p-3">
+              <div class="rounded-lg bg-gold-50 p-3">
                 <p class="text-text-light text-xs">Nearby (500m)</p>
                 <p class="text-primary text-xl font-bold">{{ nearbyIssues.length }}</p>
               </div>
@@ -227,7 +227,7 @@
                   <span class="text-text-light">{{ category.replace(/_/g, ' ') }}</span>
                   <span class="text-text font-semibold">{{ count }}</span>
                 </div>
-                <div class="h-1.5 overflow-hidden rounded-full bg-gray-200">
+                <div class="h-1.5 overflow-hidden rounded-full bg-cream-200">
                   <div
                     class="h-full bg-primary"
                     :style="{ width: (count / allIssues.length) * 100 + '%' }"
@@ -241,7 +241,7 @@
               <div
                 v-for="(hotspot, idx) in topHotspots"
                 :key="idx"
-                class="rounded-lg border border-gray-200 p-2"
+                class="rounded-lg border border-gold-200 p-2"
               >
                 <p class="text-text line-clamp-1 text-xs font-semibold">{{ hotspot.name }}</p>
                 <p class="text-text-light text-xs">{{ hotspot.count }} issues</p>
@@ -251,7 +251,7 @@
         </div>
 
         <!-- Current Location Info -->
-        <div v-if="currentLocation" class="border-t border-gray-200 bg-blue-50 p-4 text-xs">
+        <div v-if="currentLocation" class="border-t border-gold-200 bg-gold-50 p-4 text-xs">
           <p class="text-primary mb-1 font-semibold">📍 Your Location</p>
           <p class="text-text-light">
             {{ currentLocation.latitude.toFixed(5) }}, {{ currentLocation.longitude.toFixed(5) }}
@@ -264,7 +264,7 @@
     </div>
 
     <!-- Permission Denied State -->
-    <div v-else class="flex items-center justify-center bg-gray-50 py-20">
+    <div v-else class="flex items-center justify-center bg-cream-50 py-20">
       <div class="max-w-md rounded-xl bg-white p-8 text-center shadow-sm">
         <MapPinIcon class="text-text-light mx-auto mb-4 h-12 w-12 opacity-50" />
         <h2 class="text-text mb-2 text-xl font-bold">Location Access Required</h2>

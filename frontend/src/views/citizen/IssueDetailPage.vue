@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-linear-to-br from-[#ebede9] to-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-cream-50 to-cream-100">
     <div class="mx-auto max-w-4xl px-4 py-8">
       <!-- Back Button -->
       <router-link
         to="/issues"
-        class="mb-6 inline-flex items-center gap-2 font-semibold text-[#75a743] hover:underline"
+        class="mb-6 inline-flex items-center gap-2 font-semibold text-gold-700 hover:underline"
       >
         <ArrowLeftIcon class="h-5 w-5" />
         Back to Issues
@@ -13,10 +13,10 @@
       <!-- Loading State -->
       <div
         v-if="isLoading"
-        class="flex flex-col items-center rounded-xl bg-white p-12 text-center shadow-md"
+        class="flex flex-col items-center rounded-xl bg-white p-12 text-center shadow-md border border-gold-200/50"
       >
-        <ArrowPathIcon class="h-8 w-8 animate-spin text-[#75a743]" />
-        <p class="mt-4 text-[#819796]">Loading issue details...</p>
+        <ArrowPathIcon class="h-8 w-8 animate-spin text-gold-600" />
+        <p class="mt-4 text-slate-600">Loading issue details...</p>
       </div>
 
       <!-- Error State -->
@@ -27,7 +27,7 @@
         </p>
         <router-link
           to="/issues"
-          class="mt-4 inline-block font-semibold text-[#75a743] hover:underline"
+          class="mt-4 inline-block font-semibold text-gold-700 hover:underline"
         >
           Return to issues list
         </router-link>
@@ -36,7 +36,7 @@
       <!-- Issue Details -->
       <div v-else-if="issue">
         <!-- Header Card -->
-        <div class="mb-6 overflow-hidden rounded-xl bg-white shadow-md">
+        <div class="mb-6 overflow-hidden rounded-xl bg-white shadow-md border border-gold-200/50">
           <!-- Issue Image -->
           <div
             v-if="issue.image_url"
@@ -54,13 +54,13 @@
           <div class="p-8">
             <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div class="grow">
-                <h1 class="mb-2 text-3xl font-bold text-[#10141f]">{{ issue.title }}</h1>
+                <h1 class="mb-2 text-3xl font-bold text-slate-900">{{ issue.title }}</h1>
                 <div class="flex flex-wrap items-center gap-3">
                   <!-- Status Badge -->
                   <div
                     :class="{
-                      'bg-blue-100 text-blue-800': issue.status === 'pending_review',
-                      'bg-yellow-100 text-yellow-800': issue.status === 'in_progress',
+                      'bg-gold-100 text-gold-800': issue.status === 'pending_review',
+                      'bg-saffron-100 text-saffron-800': issue.status === 'in_progress',
                       'bg-green-100 text-green-800': issue.status === 'resolved',
                     }"
                     class="rounded-full px-4 py-1 text-sm font-semibold uppercase"
@@ -69,17 +69,17 @@
                   </div>
 
                   <!-- Category -->
-                  <span class="flex items-center gap-2 text-[#819796]">
-                    <TagIcon class="h-4 w-4 text-[#75a743]" />
+                  <span class="flex items-center gap-2 text-slate-600">
+                    <TagIcon class="h-4 w-4 text-gold-600" />
                     {{ formatCategory(issue.category) }}
                   </span>
 
                   <!-- Priority -->
                   <span
                     :class="{
-                      'text-orange-600': issue.priority === 'high',
-                      'text-yellow-600': issue.priority === 'medium',
-                      'text-blue-600': issue.priority === 'low',
+                      'text-saffron-600': issue.priority === 'high',
+                      'text-gold-600': issue.priority === 'medium',
+                      'text-slate-600': issue.priority === 'low',
                     }"
                     class="flex items-center font-semibold"
                   >
@@ -94,10 +94,10 @@
                 <button
                   @click="toggleUpvote"
                   :class="{
-                    'bg-[#cf573c] text-white': issue.user_has_upvoted,
-                    'bg-gray-200 text-[#10141f]': !issue.user_has_upvoted,
+                    'bg-gold-600 text-white': issue.user_has_upvoted,
+                    'bg-gold-100 text-gold-700': !issue.user_has_upvoted,
                   }"
-                  class="flex items-center justify-center gap-2 rounded-lg px-6 py-2 font-semibold transition-colors"
+                  class="flex items-center justify-center gap-2 rounded-lg px-6 py-2 font-semibold transition-colors hover:bg-gold-600 hover:text-white"
                 >
                   <HandThumbUpIcon class="h-5 w-5" />
                   Vote ({{ issue.upvote_count || 0 }})
@@ -115,23 +115,42 @@
             </div>
 
             <!-- Meta Information -->
-            <div class="mt-6 grid grid-cols-1 gap-4 border-t border-gray-200 pt-6 md:grid-cols-3">
+            <div class="mt-6 grid grid-cols-1 gap-4 border-t border-gold-200 pt-6 md:grid-cols-3">
               <div>
-                <p class="text-sm text-[#819796]">Reported by</p>
+                <p class="text-sm text-slate-600">Reported by</p>
                 <router-link
                   :to="`/profile/${issue.user_id}`"
-                  class="font-semibold text-[#25562e] transition-colors hover:text-[#75a743] hover:underline"
+                  class="font-semibold text-gold-700 transition-colors hover:text-gold-900 hover:underline"
                 >
                   {{ issue.user_name }}
                 </router-link>
               </div>
               <div>
-                <p class="text-sm text-[#819796]">Date</p>
-                <p class="font-semibold text-[#10141f]">{{ formatDate(issue.created_at) }}</p>
+                <p class="text-sm text-slate-600">Date</p>
+                <p class="font-semibold text-slate-900">{{ formatDate(issue.created_at) }}</p>
               </div>
               <div>
-                <p class="text-sm text-[#819796]">Upvotes</p>
-                <p class="font-semibold text-[#10141f]">{{ issue.upvote_count || 0 }}</p>
+                <p class="text-sm text-slate-600">Upvotes</p>
+                <p class="font-semibold text-slate-900">{{ issue.upvote_count || 0 }}</p>
+              </div>
+            </div>
+
+            <!-- Assigned Staff Information -->
+            <div v-if="issue.assigned_staff_id" class="mt-6 border-t border-gold-200 pt-6">
+              <h3 class="mb-3 text-lg font-bold text-slate-900">Assigned Staff</h3>
+              <div class="rounded-lg bg-gradient-to-r from-gold-100/40 to-saffron-100/40 p-4 border border-gold-200/50">
+                <div class="flex flex-col gap-3">
+                  <div>
+                    <p class="text-sm text-slate-600">Name</p>
+                    <p class="font-semibold text-slate-900">{{ issue.assigned_staff_first_name }} {{ issue.assigned_staff_last_name }}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-slate-600">Email</p>
+                    <a :href="`mailto:${issue.assigned_staff_email}`" class="font-semibold text-gold-700 transition-colors hover:text-gold-900 hover:underline">
+                      {{ issue.assigned_staff_email }}
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -139,8 +158,8 @@
 
         <!-- Description -->
         <div class="mb-6 rounded-xl bg-white p-8 shadow-md">
-          <h2 class="mb-4 text-2xl font-bold text-[#10141f]">Description</h2>
-          <p class="leading-relaxed whitespace-pre-wrap text-[#10141f]">{{ issue.description }}</p>
+          <h2 class="mb-4 text-2xl font-bold text-slate-900">Description</h2>
+          <p class="leading-relaxed whitespace-pre-wrap text-slate-700">{{ issue.description }}</p>
         </div>
 
         <!-- Location -->
@@ -148,17 +167,17 @@
           v-if="issue.latitude && issue.longitude"
           class="mb-6 rounded-xl bg-white p-8 shadow-md"
         >
-          <h2 class="mb-4 text-2xl font-bold text-[#10141f]">Location</h2>
-          <p v-if="issue.location" class="mb-2 flex items-start text-[#10141f]">
-            <MapPinIcon class="mt-0.5 mr-2 inline h-5 w-5 flex-shrink-0 text-[#75a743]" />
+          <h2 class="mb-4 text-2xl font-bold text-slate-900">Location</h2>
+          <p v-if="issue.location" class="mb-2 flex items-start text-slate-700">
+            <MapPinIcon class="mt-0.5 mr-2 inline h-5 w-5 flex-shrink-0 text-gold-700" />
             <span class="font-semibold">{{ issue.location }}</span>
           </p>
-          <p class="mb-4 flex items-center text-sm text-[#819796]">
+          <p class="mb-4 flex items-center text-sm text-slate-600">
             <span class="ml-7"
               >Coordinates: {{ issue.latitude.toFixed(6) }}, {{ issue.longitude.toFixed(6) }}</span
             >
           </p>
-          <div id="issue-map" class="h-64 rounded-lg border border-gray-300"></div>
+          <div id="issue-map" class="h-64 rounded-lg border border-gold-200"></div>
         </div>
       </div>
     </div>

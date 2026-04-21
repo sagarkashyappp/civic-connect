@@ -195,14 +195,29 @@ watch(
 
 /* Chat Window */
 .chat-window {
-  width: 380px;
-  height: 550px;
+  width: min(380px, calc(100vw - 1.5rem));
+  height: min(550px, calc(100dvh - 2rem));
   background: white;
   border-radius: 1rem;
   box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.chat-window,
+.chat-window * {
+  box-sizing: border-box;
+}
+
+.chat-header h3 {
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.chat-header p {
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 @media (max-width: 640px) {
@@ -212,7 +227,8 @@ watch(
     right: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
   }
 
@@ -294,7 +310,7 @@ watch(
 .message-bubble {
   padding: 0.75rem 1rem;
   border-radius: 1rem;
-  font-size: 0.875rem;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -371,7 +387,7 @@ watch(
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  font-size: 0.8125rem;
+  font-size: 13px;
   color: #4b5563;
   text-align: left;
   transition: all 0.2s ease;
@@ -400,7 +416,7 @@ watch(
   padding: 0.75rem 1rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.75rem;
-  font-size: 0.875rem;
+  font-size: 14px;
   outline: none;
   transition: all 0.2s ease;
 }

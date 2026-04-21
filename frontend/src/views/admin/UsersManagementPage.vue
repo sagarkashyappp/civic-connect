@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-12">
+  <div class="min-h-screen bg-cream-50 pb-12">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
+    <div class="bg-white shadow-sm border-b border-gold-200/60">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold text-gray-900">Manage Users</h1>
-        <p class="mt-1 text-sm text-gray-500">View users and manage their roles and permissions.</p>
+        <h1 class="text-2xl font-bold text-slate-900">Manage Users</h1>
+        <p class="mt-1 text-sm text-slate-600">View users and manage their roles and permissions.</p>
       </div>
     </div>
 
@@ -14,23 +14,23 @@
       <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div class="relative w-full max-w-md">
           <MagnifyingGlassIcon
-            class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400"
+            class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gold-400"
           />
           <input
             v-model="searchQuery"
             @input="handleSearch"
             type="text"
             placeholder="Search by name or email..."
-            class="w-full rounded-lg border-gray-300 py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-blue-500"
+            class="w-full rounded-lg border-gold-200 bg-white py-2 pr-4 pl-10 text-sm text-slate-800 focus:border-gold-400 focus:ring-gold-300"
           />
         </div>
       </div>
 
       <!-- Users Table -->
-      <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+      <div class="overflow-hidden rounded-xl bg-white shadow-sm border border-gold-200/50">
         <div v-if="loading" class="flex h-64 items-center justify-center">
           <div
-            class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+            class="h-8 w-8 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
           ></div>
         </div>
 
@@ -38,64 +38,64 @@
           v-else-if="users.length === 0"
           class="flex h-64 flex-col items-center justify-center py-12 text-center"
         >
-          <h3 class="mt-2 text-sm font-semibold text-gray-900">No users found</h3>
-          <p class="mt-1 text-sm text-gray-500">Try adjusting your search terms.</p>
+          <h3 class="mt-2 text-sm font-semibold text-slate-900">No users found</h3>
+          <p class="mt-1 text-sm text-slate-600">Try adjusting your search terms.</p>
         </div>
 
-        <table v-else class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table v-else class="min-w-full divide-y divide-gold-100/70">
+          <thead class="bg-cream-50">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 User
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Role
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Status
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Joined
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Last Login
               </th>
               <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
+          <tbody class="divide-y divide-gold-100/70 bg-white">
             <tr
               v-for="user in users"
               :key="user.id"
-              class="group transition-colors hover:bg-gray-50"
+              class="group transition-colors hover:bg-gold-50/40"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-500"
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-100 font-semibold text-gold-700"
                   >
                     {{ user.first_name[0] }}{{ user.last_name[0] }}
                   </div>
                   <div class="ml-4">
-                    <div class="font-medium text-gray-900">
+                    <div class="font-medium text-slate-900">
                       {{ user.first_name }} {{ user.last_name }}
                     </div>
-                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                    <div class="text-sm text-slate-600">{{ user.email }}</div>
                   </div>
                 </div>
               </td>
@@ -103,9 +103,9 @@
                 <span
                   class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize"
                   :class="{
-                    'bg-gray-100 text-gray-800': user.role === 'citizen',
-                    'bg-blue-100 text-blue-800': user.role === 'staff',
-                    'bg-purple-100 text-purple-800': user.role === 'admin',
+                    'bg-gold-100 text-gold-800': user.role === 'citizen',
+                    'bg-saffron-100 text-saffron-800': user.role === 'staff',
+                    'bg-slate-100 text-slate-800': user.role === 'admin',
                   }"
                 >
                   {{ user.role }}
@@ -121,14 +121,14 @@
                   {{ user.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ formatDate(user.created_at) }}
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ user.last_login ? formatDate(user.last_login) : 'Never' }}
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                <button @click="openRoleModal(user)" class="text-blue-600 hover:text-blue-900">
+                <button @click="openRoleModal(user)" class="text-gold-700 hover:text-gold-900">
                   Edit Role
                 </button>
               </td>
@@ -139,27 +139,27 @@
         <!-- Pagination -->
         <div
           v-if="pagination.total_pages > 1"
-          class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+          class="flex items-center justify-between border-t border-gold-200/60 bg-white px-4 py-3 sm:px-6"
         >
           <div class="flex flex-1 justify-between sm:hidden">
             <button
               @click="changePage(pagination.current_page - 1)"
               :disabled="pagination.current_page === 1"
-              class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              class="relative inline-flex items-center rounded-md border border-gold-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-50 disabled:opacity-50"
             >
               Previous
             </button>
             <button
               @click="changePage(pagination.current_page + 1)"
               :disabled="pagination.current_page === pagination.total_pages"
-              class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              class="relative ml-3 inline-flex items-center rounded-md border border-gold-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-50 disabled:opacity-50"
             >
               Next
             </button>
           </div>
           <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm text-gray-700">
+              <p class="text-sm text-slate-700">
                 Showing
                 <span class="font-medium">{{
                   (pagination.current_page - 1) * pagination.limit + 1
@@ -181,7 +181,7 @@
                 <button
                   @click="changePage(pagination.current_page - 1)"
                   :disabled="pagination.current_page === 1"
-                  class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gold-500 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span class="sr-only">Previous</span>
                   <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
@@ -192,8 +192,8 @@
                   @click="changePage(page)"
                   :class="[
                     page === pagination.current_page
-                      ? 'relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                      : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0',
+                      ? 'relative z-10 inline-flex items-center bg-gold-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-600'
+                      : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0',
                   ]"
                 >
                   {{ page }}
@@ -201,7 +201,7 @@
                 <button
                   @click="changePage(pagination.current_page + 1)"
                   :disabled="pagination.current_page === pagination.total_pages"
-                  class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gold-500 ring-1 ring-gold-200 ring-inset hover:bg-gold-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span class="sr-only">Next</span>
                   <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
@@ -219,10 +219,10 @@
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
     >
       <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <h3 class="text-lg font-semibold text-gray-900">Edit User Role</h3>
-        <p class="mt-2 text-sm text-gray-500">
+        <h3 class="text-lg font-semibold text-slate-900">Edit User Role</h3>
+        <p class="mt-2 text-sm text-slate-600">
           Change role for
-          <span class="font-medium text-gray-900"
+          <span class="font-medium text-slate-900"
             >{{ editingUser.first_name }} {{ editingUser.last_name }}</span
           >.
         </p>
@@ -235,9 +235,9 @@
               name="role"
               type="radio"
               :value="role"
-              class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600"
+              class="h-4 w-4 border-gold-300 text-gold-600 focus:ring-gold-600"
             />
-            <label :for="role" class="ml-3 block text-sm font-medium text-gray-700 capitalize">
+            <label :for="role" class="ml-3 block text-sm font-medium text-slate-700 capitalize">
               {{ role }}
             </label>
           </div>
@@ -246,14 +246,14 @@
         <div class="mt-6 flex justify-end gap-3">
           <button
             @click="closeRoleModal"
-            class="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-gold-100"
           >
             Cancel
           </button>
           <button
             @click="saveRole"
             :disabled="saving"
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            class="rounded-lg bg-gold-600 px-4 py-2 text-sm font-medium text-white hover:bg-gold-700 disabled:opacity-50"
           >
             {{ saving ? 'Saving...' : 'Save Role' }}
           </button>

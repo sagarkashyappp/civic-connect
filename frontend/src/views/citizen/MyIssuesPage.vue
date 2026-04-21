@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#ebede9] to-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-cream-50 to-cream-100">
     <div class="mx-auto max-w-7xl px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="mb-2 text-4xl font-bold text-[#10141f]">My Issues</h1>
-        <p class="text-[#819796]">Track the status of issues you have reported</p>
+        <h1 class="mb-2 text-4xl font-bold text-slate-900">My Issues</h1>
+        <p class="text-slate-600">Track the status of issues you have reported</p>
       </div>
 
       <!-- Loading State -->
       <div v-if="isLoading" class="flex flex-col items-center py-12 text-center">
-        <ArrowPathIcon class="h-8 w-8 animate-spin text-[#75a743]" />
-        <p class="mt-4 text-[#819796]">Loading your issues...</p>
+        <ArrowPathIcon class="h-8 w-8 animate-spin text-gold-700" />
+        <p class="mt-4 text-slate-600">Loading your issues...</p>
       </div>
 
       <!-- Error State -->
@@ -29,9 +29,9 @@
         v-else-if="myIssues.length === 0"
         class="flex flex-col items-center rounded-xl bg-white p-12 text-center shadow-md"
       >
-        <InboxIcon class="mb-4 block h-12 w-12 text-[#819796] opacity-50" />
-        <p class="text-lg text-[#819796]">You haven't reported any issues yet.</p>
-        <router-link to="/report-issue" class="mt-4 font-semibold text-[#75a743] hover:underline">
+        <InboxIcon class="mb-4 block h-12 w-12 text-slate-600 opacity-50" />
+        <p class="text-lg text-slate-600">You haven't reported any issues yet.</p>
+        <router-link to="/report-issue" class="mt-4 font-semibold text-gold-700 hover:underline">
           Report an Issue
         </router-link>
       </div>
@@ -47,9 +47,9 @@
           <div
             class="absolute top-0 left-0 h-full w-1.5 opacity-80"
             :class="{
-              'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]':
+              'bg-gold-600 shadow-[0_0_10px_rgba(212,175,55,0.5)]':
                 issue.status === 'pending_review',
-              'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]': issue.status === 'in_progress',
+              'bg-saffron-500 shadow-[0_0_10px_rgba(236,72,153,0.5)]': issue.status === 'in_progress',
               'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]': issue.status === 'resolved',
             }"
           ></div>
@@ -65,7 +65,7 @@
               />
               <div
                 v-else
-                class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400"
+                class="flex h-full w-full items-center justify-center bg-cream-100 text-slate-400"
               >
                 <PhotoIcon class="h-12 w-12" />
               </div>
@@ -74,9 +74,9 @@
               <div class="absolute top-3 left-3">
                 <span
                   :class="{
-                    'bg-blue-100/90 text-blue-800 ring-blue-500/30':
+                    'bg-gold-100/90 text-gold-800 ring-gold-500/30':
                       issue.status === 'pending_review',
-                    'bg-yellow-100/90 text-yellow-800 ring-yellow-500/30':
+                    'bg-saffron-100/90 text-saffron-800 ring-saffron-500/30':
                       issue.status === 'in_progress',
                     'bg-green-100/90 text-green-800 ring-green-500/30': issue.status === 'resolved',
                   }"
@@ -91,16 +91,16 @@
             <div class="flex flex-grow flex-col justify-between p-6">
               <div>
                 <div class="mb-2 flex items-start justify-between">
-                  <span class="text-xs font-medium text-[#819796]">
+                  <span class="text-xs font-medium text-slate-600">
                     Reported {{ formatDate(issue.created_at) }}
                   </span>
                   <div class="flex items-center gap-1">
                     <span
                       class="flex items-center text-xs font-semibold uppercase"
                       :class="{
-                        'text-orange-600': issue.priority === 'high',
-                        'text-yellow-600': issue.priority === 'medium',
-                        'text-blue-600': issue.priority === 'low',
+                        'text-saffron-600': issue.priority === 'high',
+                        'text-gold-600': issue.priority === 'medium',
+                        'text-slate-600': issue.priority === 'low',
                       }"
                     >
                       <ExclamationCircleIcon class="mr-1 h-3.5 w-3.5" />
@@ -111,22 +111,22 @@
 
                 <router-link
                   :to="`/issues/${issue.id}`"
-                  class="group-hover:text-primary mb-2 block text-xl font-bold text-[#10141f] transition-colors"
+                  class="group-hover:text-primary mb-2 block text-xl font-bold text-slate-900 transition-colors"
                 >
                   {{ issue.title }}
                 </router-link>
 
-                <p class="mb-4 line-clamp-2 text-sm leading-relaxed text-[#10141f]/70">
+                <p class="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-700">
                   {{ issue.description }}
                 </p>
 
                 <div class="flex flex-wrap items-center gap-4 text-sm">
-                  <span class="flex items-center rounded-md bg-gray-100 px-2.5 py-1 text-[#819796]">
+                  <span class="flex items-center rounded-md bg-gold-100 px-2.5 py-1 text-gold-700">
                     <TagIcon class="mr-1.5 h-3.5 w-3.5" />
                     {{ formatCategory(issue.category) }}
                   </span>
-                  <span class="flex items-center font-medium text-[#819796]">
-                    <HandThumbUpIcon class="mr-1.5 h-4 w-4 text-[#75a743]" />
+                  <span class="flex items-center font-medium text-slate-600">
+                    <HandThumbUpIcon class="mr-1.5 h-4 w-4 text-gold-700" />
                     {{ issue.upvote_count || 0 }}
                     <span class="ml-1 hidden sm:inline">Votes</span>
                   </span>
@@ -137,7 +137,7 @@
               <div class="mt-6 md:flex md:justify-end">
                 <router-link
                   :to="`/issues/${issue.id}`"
-                  class="flex w-full items-center justify-center rounded-xl bg-[#25562e] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1a3d21] hover:shadow md:w-auto"
+                  class="flex w-full items-center justify-center rounded-xl bg-gold-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-gold-700 hover:shadow md:w-auto"
                 >
                   View Status
                   <ArrowRightIcon class="ml-2 h-4 w-4" />

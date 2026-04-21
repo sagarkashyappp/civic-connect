@@ -68,9 +68,18 @@ class IssueController {
         }
 
         try {
+            // Get assigned staff based on category
+            $staff_stmt = $this->pdo->prepare("
+                SELECT staff_id, department_name FROM category_staff_mapping 
+                WHERE category = ?
+            ");
+            $staff_stmt->execute([$data['category']]);
+            $assigned_staff = $staff_stmt->fetch();
+            $assigned_to = $assigned_staff ? $assigned_staff['staff_id'] : null;
+
             $stmt = $this->pdo->prepare("
-                INSERT INTO issues (user_id, title, description, category, location, latitude, longitude, priority, status, image_path)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO issues (user_id, title, description, category, assigned_to, location, latitude, longitude, priority, status, image_path)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             $priority = $data['priority'] ?? 'medium';
@@ -96,6 +105,7 @@ class IssueController {
                 $data['title'],
                 $data['description'],
                 $data['category'],
+                $assigned_to,
                 $location,
                 $latitude,
                 $longitude,
@@ -115,8 +125,24 @@ class IssueController {
             if ($image_path) {
                 $audit_data['image_uploaded'] = true;
             }
+            if ($assigned_staff) {
+                $audit_data['auto_assigned_to'] = $assigned_staff['department_name'];
+            }
             
             Middleware::logAuditTrail($user['user_id'], 'ISSUE_CREATED', 'issues', $issue_id, null, $audit_data);
+
+            // Log assignment in issue_updates if assigned
+            if ($assigned_to) {
+                $update_stmt = $this->pdo->prepare("
+                    INSERT INTO issue_updates (issue_id, user_id, update_type, content)
+                    VALUES (?, ?, 'assigned', ?)
+                ");
+                $update_stmt->execute([
+                    $issue_id,
+                    $assigned_to,
+                    'Automatically assigned to ' . $assigned_staff['department_name']
+                ]);
+            }
 
             sendResponse([
                 'success' => true,
@@ -146,9 +172,14 @@ class IssueController {
                     i.*,
                     u.first_name,
                     u.last_name,
+                    s.id as assigned_staff_id,
+                    s.first_name as assigned_staff_first_name,
+                    s.last_name as assigned_staff_last_name,
+                    s.email as assigned_staff_email,
                     (SELECT COUNT(*) FROM upvotes WHERE issue_id = i.id) as upvote_count
                 FROM issues i
                 LEFT JOIN users u ON i.user_id = u.id
+                LEFT JOIN users s ON i.assigned_to = s.id
                 WHERE i.id = ?
             ");
             $stmt->execute([$issue_id]);
@@ -298,6 +329,10 @@ class IssueController {
                 i.*,
                 u.first_name,
                 u.last_name,
+                s.id as assigned_staff_id,
+                s.first_name as assigned_staff_first_name,
+                s.last_name as assigned_staff_last_name,
+                s.email as assigned_staff_email,
                 (SELECT COUNT(*) FROM upvotes WHERE issue_id = i.id) as upvote_count
             ";
             
@@ -320,6 +355,7 @@ class IssueController {
                     $select_fields
                 FROM issues i
                 LEFT JOIN users u ON i.user_id = u.id
+                LEFT JOIN users s ON i.assigned_to = s.id
                 WHERE $where_clause
                 ORDER BY i.$sort_by $sort_order
                 LIMIT ? OFFSET ?
@@ -357,17 +393,16 @@ class IssueController {
                 // Add user_name field
                 $issue['user_name'] = trim($issue['first_name'] . ' ' . $issue['last_name']);
 
-                // Add latest assigned staff info
-                $assigned_staff = $this->getAssignedStaffForIssue($issue['id']);
-                if ($assigned_staff) {
-                    $issue['assigned_staff_id'] = (int)$assigned_staff['id'];
-                    $issue['assigned_staff_name'] = trim($assigned_staff['first_name'] . ' ' . $assigned_staff['last_name']);
-                    $issue['assigned_staff_email'] = $assigned_staff['email'];
+                // Add assigned staff name from joined fields
+                if (!empty($issue['assigned_staff_id'])) {
+                    $issue['assigned_staff_name'] = trim($issue['assigned_staff_first_name'] . ' ' . $issue['assigned_staff_last_name']);
                 } else {
-                    $issue['assigned_staff_id'] = null;
                     $issue['assigned_staff_name'] = null;
-                    $issue['assigned_staff_email'] = null;
                 }
+                
+                // Clean up temporary fields
+                unset($issue['assigned_staff_first_name']);
+                unset($issue['assigned_staff_last_name']);
             }
 
             sendResponse([
@@ -450,6 +485,10 @@ class IssueController {
 
                 $assign_stmt = $this->pdo->prepare("\n                    INSERT INTO issue_updates (issue_id, user_id, update_type, content)\n                    VALUES (?, ?, 'assigned', ?)\n                ");
                 $assign_stmt->execute([$issue_id, $assigned_staff_id, $assign_payload]);
+
+                // Update assigned_to column
+                $update_fields[] = "i.assigned_to = ?";
+                $update_values[] = $assigned_staff_id;
 
                 Middleware::logAuditTrail(
                     $user['user_id'],

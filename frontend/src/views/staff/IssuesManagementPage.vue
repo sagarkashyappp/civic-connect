@@ -1,32 +1,32 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-12">
+  <div class="min-h-screen bg-cream-50 pb-12 text-slate-700">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
-      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold text-gray-900">Manage Issues</h1>
-        <p class="mt-1 text-sm text-gray-500">View and manage all reported issues.</p>
+    <div class="bg-gold-100/60 shadow-sm border-b border-gold-200/60">
+      <div class="w-full px-4 py-6 sm:px-6 lg:px-8 xl:px-10">
+        <h1 class="text-2xl font-bold text-slate-900">Manage Issues</h1>
+        <p class="mt-1 text-sm text-slate-600">View and manage all reported issues.</p>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="mx-auto mt-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mt-8 w-full px-4 sm:px-6 lg:px-8 xl:px-10">
       <!-- Filters & Search -->
       <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div class="flex items-center gap-2">
           <div class="relative">
             <MagnifyingGlassIcon
-              class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400"
+              class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gold-400"
             />
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search issues..."
-              class="w-full rounded-lg border-gray-300 py-2 pr-4 pl-10 text-sm focus:border-blue-500 focus:ring-blue-500 sm:w-64"
+              class="w-full rounded-lg border-gold-200 bg-white py-2 pr-4 pl-10 text-sm text-slate-800 focus:border-gold-400 focus:ring-gold-300 sm:w-64"
             />
           </div>
           <select
             v-model="selectedCategory"
-            class="rounded-lg border-gray-300 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+            class="rounded-lg border-gold-200 bg-white py-2 text-sm text-slate-800 focus:border-gold-400 focus:ring-gold-300"
           >
             <option value="">All Categories</option>
             <option
@@ -39,7 +39,7 @@
           </select>
         </div>
 
-        <div class="flex items-center gap-2 rounded-lg bg-white p-1 shadow-sm ring-1 ring-gray-200">
+        <div class="flex items-center gap-2 rounded-lg bg-white p-1 shadow-sm ring-1 ring-gold-200/70">
           <button
             v-for="filter in statusFilters"
             :key="filter.value"
@@ -47,8 +47,8 @@
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="[
               activeStatusFilter === filter.value
-                ? 'bg-blue-50 text-blue-700 shadow-sm'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                ? 'bg-gold-100 text-gold-800 shadow-sm'
+                : 'text-slate-600 hover:bg-gold-50 hover:text-slate-800',
             ]"
           >
             {{ filter.label }}
@@ -57,13 +57,13 @@
       </div>
 
       <!-- Issues Table -->
-      <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+      <div class="overflow-hidden rounded-xl bg-white shadow-sm border border-gold-200/50">
         <div
           v-if="issuesStore.isLoading && !issuesStore.issues.length"
           class="flex h-64 items-center justify-center"
         >
           <div
-            class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+            class="h-8 w-8 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
           ></div>
         </div>
 
@@ -71,43 +71,43 @@
           v-else-if="filteredIssues.length === 0"
           class="flex h-64 flex-col items-center justify-center py-12 text-center"
         >
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-            <InboxIcon class="h-6 w-6 text-gray-400" />
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-100">
+            <InboxIcon class="h-6 w-6 text-gold-500" />
           </div>
-          <h3 class="mt-2 text-sm font-semibold text-gray-900">No issues found</h3>
-          <p class="mt-1 text-sm text-gray-500">No issues match your current filters.</p>
+          <h3 class="mt-2 text-sm font-semibold text-slate-900">No issues found</h3>
+          <p class="mt-1 text-sm text-slate-600">No issues match your current filters.</p>
         </div>
 
-        <table v-else class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table v-else class="min-w-full divide-y divide-gold-100/70">
+          <thead class="bg-cream-50">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Issue
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Category
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Status
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Date
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-600 uppercase"
               >
                 Votes
               </th>
@@ -116,11 +116,11 @@
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
+          <tbody class="divide-y divide-gold-100/70 bg-white">
             <tr
               v-for="issue in filteredIssues"
               :key="issue.id"
-              class="group transition-colors hover:bg-gray-50"
+              class="group transition-colors hover:bg-gold-50/40"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
@@ -133,14 +133,14 @@
                     />
                     <div
                       v-else
-                      class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-400"
+                      class="flex h-10 w-10 items-center justify-center rounded-lg bg-gold-100 text-gold-500"
                     >
                       <PhotoIcon class="h-6 w-6" />
                     </div>
                   </div>
                   <div class="ml-4">
-                    <div class="font-medium text-gray-900">{{ issue.title }}</div>
-                    <div class="line-clamp-1 max-w-[200px] text-sm text-gray-500">
+                    <div class="font-medium text-slate-900">{{ issue.title }}</div>
+                    <div class="line-clamp-1 max-w-[200px] text-sm text-slate-600">
                       {{ issue.description }}
                     </div>
                   </div>
@@ -148,7 +148,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
-                  class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800"
+                  class="inline-flex items-center rounded-full bg-gold-100 px-2.5 py-0.5 text-xs font-medium text-gold-800"
                 >
                   {{ formatCategory(issue.category) }}
                 </span>
@@ -163,19 +163,19 @@
                   {{ formatStatus(issue.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 {{ formatDate(issue.created_at) }}
               </td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-slate-600">
                 <div class="flex items-center gap-1">
-                  <HandThumbUpIcon class="h-4 w-4 text-gray-400" />
+                  <HandThumbUpIcon class="h-4 w-4 text-gold-500" />
                   {{ issue.upvote_count }}
                 </div>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                 <router-link
                   :to="`/staff/issues/${issue.id}`"
-                  class="text-blue-600 hover:text-blue-900"
+                  class="text-gold-700 hover:text-gold-900"
                   >Manage</router-link
                 >
               </td>
@@ -263,13 +263,13 @@ const formatStatus = (status) => {
 const getStatusColor = (status) => {
   switch (status) {
     case 'pending_review':
-      return 'bg-yellow-100 text-yellow-800'
+      return 'bg-gold-100 text-gold-800'
     case 'in_progress':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-saffron-100 text-saffron-800'
     case 'resolved':
       return 'bg-green-100 text-green-800'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'bg-cream-100 text-slate-700'
   }
 }
 

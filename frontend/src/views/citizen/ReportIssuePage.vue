@@ -4,15 +4,15 @@
     <div class="mb-8">
       <router-link
         to="/issues"
-        class="text-text-light hover:text-primary group mb-4 inline-flex items-center gap-2 font-medium transition-colors"
+        class="text-slate-600 hover:text-gold-700 group mb-4 inline-flex items-center gap-2 font-medium transition-colors"
       >
         <ArrowLeftIcon class="h-4 w-4 transition-transform group-hover:-translate-x-1" />
         Back to Issues
       </router-link>
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-text mb-2 text-3xl font-bold md:text-4xl">Report an Issue</h1>
-          <p class="text-text-light text-lg">
+          <h1 class="text-slate-900 mb-2 text-3xl font-bold md:text-4xl">Report an Issue</h1>
+          <p class="text-slate-600 text-lg">
             Help improve our community by reporting problems you see.
           </p>
         </div>
@@ -20,13 +20,13 @@
     </div>
 
     <!-- Form Card -->
-    <div class="shadow-soft overflow-hidden rounded-2xl border border-gray-100 bg-white">
+    <div class="shadow-soft overflow-hidden rounded-2xl border border-gold-200/50 bg-white backdrop-blur-sm">
       <form @submit.prevent="submitIssue" class="space-y-8 p-6 md:p-8">
         <!-- Section: Category -->
         <section>
-          <h3 class="text-text mb-4 flex items-center gap-2 text-lg font-bold">
+          <h3 class="text-slate-900 mb-4 flex items-center gap-2 text-lg font-bold">
             <span
-              class="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-sm"
+              class="bg-gold-100 text-gold-700 flex h-6 w-6 items-center justify-center rounded-full text-sm"
               >1</span
             >
             What type of issue is this?
@@ -35,22 +35,22 @@
             <label v-for="cat in categories" :key="cat.value" class="group relative cursor-pointer">
               <input type="radio" v-model="form.category" :value="cat.value" class="peer sr-only" />
               <div
-                class="peer-checked:border-primary peer-checked:bg-primary-light/20 group-hover:border-primary/50 rounded-xl border-2 border-gray-100 p-4 text-center transition-all duration-200 peer-checked:shadow-sm"
+                class="peer-checked:border-gold-400 peer-checked:bg-gold-100/40 group-hover:border-gold-300 rounded-xl border-2 border-gold-100 p-4 text-center transition-all duration-200 peer-checked:shadow-sm"
               >
                 <!-- Icon placeholder (could be dynamic based on category) -->
                 <div
-                  class="text-primary mb-2 opacity-80 transition-transform duration-200 group-hover:scale-110"
+                  class="text-gold-600 mb-2 opacity-80 transition-transform duration-200 group-hover:scale-110"
                 >
                   <FolderIcon class="mx-auto h-8 w-8" />
                 </div>
                 <span
-                  class="text-text peer-checked:text-primary block text-sm font-semibold transition-colors"
+                  class="text-slate-700 peer-checked:text-gold-800 block text-sm font-semibold transition-colors"
                   >{{ cat.label }}</span
                 >
               </div>
             </label>
           </div>
-          <p v-if="errors.category" class="text-danger mt-2 flex items-center gap-1 text-sm">
+          <p v-if="errors.category" class="text-red-600 mt-2 flex items-center gap-1 text-sm">
             <ExclamationCircleIcon class="h-4 w-4" /> {{ errors.category }}
           </p>
         </section>
@@ -58,9 +58,9 @@
         <!-- Section: Details -->
         <section class="grid gap-8 md:grid-cols-2">
           <div class="space-y-6">
-            <h3 class="text-text mb-4 flex items-center gap-2 text-lg font-bold">
+            <h3 class="text-slate-900 mb-4 flex items-center gap-2 text-lg font-bold">
               <span
-                class="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-sm"
+                class="bg-gold-100 text-gold-700 flex h-6 w-6 items-center justify-center rounded-full text-sm"
                 >2</span
               >
               Describe the problem
@@ -68,63 +68,63 @@
 
             <!-- Title -->
             <div>
-              <label for="title" class="text-text mb-1 block text-sm font-medium"
-                >Title <span class="text-danger">*</span></label
+              <label for="title" class="text-slate-700 mb-1 block text-sm font-medium"
+                >Title <span class="text-red-600">*</span></label
               >
               <input
                 type="text"
                 id="title"
                 v-model="form.title"
                 placeholder="e.g., Pothole on Main St"
-                class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border-gray-200 bg-gray-50 px-4 py-2.5 transition-all outline-none focus:bg-white focus:ring-2"
+                class="focus:ring-gold-200 focus:border-gold-400 w-full rounded-lg border border-gold-200 bg-cream-50 px-4 py-2.5 transition-all outline-none focus:bg-white focus:ring-2"
               />
-              <p v-if="errors.title" class="text-danger mt-1 text-xs">{{ errors.title }}</p>
+              <p v-if="errors.title" class="text-red-600 mt-1 text-xs">{{ errors.title }}</p>
             </div>
 
             <!-- Description -->
             <div>
-              <label for="description" class="text-text mb-1 block text-sm font-medium"
-                >Description <span class="text-danger">*</span></label
+              <label for="description" class="text-slate-700 mb-1 block text-sm font-medium"
+                >Description <span class="text-red-600">*</span></label
               >
               <textarea
                 id="description"
                 v-model="form.description"
                 rows="4"
                 placeholder="Please describe the issue in detail..."
-                class="focus:ring-primary/20 focus:border-primary w-full resize-none rounded-lg border-gray-200 bg-gray-50 px-4 py-2.5 transition-all outline-none focus:bg-white focus:ring-2"
+                class="focus:ring-gold-200 focus:border-gold-400 w-full resize-none rounded-lg border border-gold-200 bg-cream-50 px-4 py-2.5 transition-all outline-none focus:bg-white focus:ring-2"
               ></textarea>
-              <p v-if="errors.description" class="text-danger mt-1 text-xs">
+              <p v-if="errors.description" class="text-red-600 mt-1 text-xs">
                 {{ errors.description }}
               </p>
             </div>
 
             <!-- Priority -->
             <div>
-              <label class="text-text mb-2 block text-sm font-medium">Priority Level</label>
+              <label class="text-slate-700 mb-2 block text-sm font-medium">Priority Level</label>
               <div class="flex gap-3">
                 <label class="inline-flex cursor-pointer items-center">
                   <input type="radio" v-model="form.priority" value="low" class="peer sr-only" />
                   <span
-                    class="text-text-light peer-checked:text-text rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium transition-colors peer-checked:border-gray-300 peer-checked:bg-gray-100"
+                    class="text-slate-600 peer-checked:text-slate-900 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors peer-checked:border-gold-300 peer-checked:bg-gold-100"
                     >Low</span
                   >
                 </label>
                 <label class="inline-flex cursor-pointer items-center">
                   <input type="radio" v-model="form.priority" value="medium" class="peer sr-only" />
                   <span
-                    class="text-text-light peer-checked:bg-warning-light peer-checked:text-warning-dark peer-checked:border-warning rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium transition-colors"
+                    class="text-slate-600 peer-checked:bg-gold-200 peer-checked:text-gold-900 peer-checked:border-gold-400 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors"
                     >Medium</span
                   >
                 </label>
                 <label class="inline-flex cursor-pointer items-center">
                   <input type="radio" v-model="form.priority" value="high" class="peer sr-only" />
                   <span
-                    class="text-text-light peer-checked:bg-danger-light peer-checked:text-danger-dark peer-checked:border-danger rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium transition-colors"
+                    class="text-slate-600 peer-checked:bg-saffron-200 peer-checked:text-saffron-900 peer-checked:border-saffron-400 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors"
                     >High</span
                   >
                 </label>
               </div>
-              <p class="mt-2 inline-block rounded-lg bg-blue-50 p-2 text-xs text-blue-700">
+              <p class="mt-2 inline-block rounded-lg bg-saffron-50 p-2 text-xs text-saffron-700">
                 <ExclamationCircleIcon class="mr-1 inline h-3 w-3" />
                 High priority is for immediate safety hazards.
               </p>
@@ -133,15 +133,15 @@
 
           <!-- Image Upload -->
           <div>
-            <h3 class="text-text mb-4 flex items-center gap-2 text-lg font-bold">
+            <h3 class="text-slate-900 mb-4 flex items-center gap-2 text-lg font-bold">
               <span
-                class="bg-primary/10 text-primary flex h-6 w-6 items-center justify-center rounded-full text-sm"
+                class="bg-gold-100 text-gold-700 flex h-6 w-6 items-center justify-center rounded-full text-sm"
                 >3</span
               >
               Add a photo
             </h3>
             <div
-              class="hover:border-primary/50 group relative flex h-[calc(100%-3rem)] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-6 text-center transition-all hover:bg-white"
+              class="hover:border-gold-300 group relative flex h-[calc(100%-3rem)] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gold-200 bg-cream-50 p-6 text-center transition-all hover:bg-white"
               @dragover.prevent
               @drop.prevent="handleFileDrop"
               @click="triggerFileInput"
@@ -158,10 +158,10 @@
                 <div
                   class="mb-3 rounded-full bg-white p-3 shadow-sm transition-transform group-hover:scale-110"
                 >
-                  <PhotoIcon class="text-primary h-8 w-8" />
+                  <PhotoIcon class="text-gold-600 h-8 w-8" />
                 </div>
-                <p class="text-text text-sm font-semibold">Click to upload or drag & drop</p>
-                <p class="text-text-light mt-1 text-xs">JPG, PNG, GIF up to 5MB</p>
+                <p class="text-slate-900 text-sm font-semibold">Click to upload or drag & drop</p>
+                <p class="text-slate-600 mt-1 text-xs">JPG, PNG, GIF up to 5MB</p>
               </div>
 
               <div v-else class="flex w-full flex-col items-center">
@@ -172,12 +172,12 @@
                   <img :src="imagePreview" class="h-full w-full object-cover" />
                   <button
                     @click.stop="removeImage"
-                    class="text-danger absolute top-2 right-2 rounded-full bg-white/90 p-1.5 shadow-sm transition-colors hover:bg-white"
+                    class="text-red-600 absolute top-2 right-2 rounded-full bg-white/90 p-1.5 shadow-sm transition-colors hover:bg-white"
                   >
                     <TrashIcon class="h-4 w-4" />
                   </button>
                 </div>
-                <p class="text-success mb-2 flex items-center text-sm font-semibold">
+                <p class="text-green-600 mb-2 flex items-center text-sm font-semibold">
                   <CheckCircleIcon class="mr-1 h-5 w-5" />
                   {{ form.image.name }}
                 </p>
@@ -221,7 +221,7 @@
                 id="location"
                 v-model="form.location"
                 placeholder="e.g., Mall Road, near bus stand"
-                class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border-gray-200 bg-gray-50 px-4 py-2.5 transition-all outline-none focus:bg-white focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+                class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border-gold-200 bg-cream-50 px-4 py-2.5 transition-all outline-none focus:bg-white focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
                 :disabled="!hasLocationPermission"
                 autocomplete="off"
                 @input="handleLocationInput"
@@ -231,7 +231,7 @@
 
               <div
                 v-if="showLocationSuggestions"
-                class="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+                class="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gold-200 bg-white shadow-lg"
               >
                 <p v-if="isSearchingLocation" class="text-text-light px-4 py-3 text-sm">
                   Searching locations...
@@ -240,7 +240,7 @@
                   v-for="suggestion in locationSuggestions"
                   :key="suggestion.id"
                   type="button"
-                  class="hover:bg-primary-light/20 w-full border-b border-gray-100 px-4 py-2 text-left text-sm text-gray-800 last:border-b-0"
+                  class="hover:bg-primary-light/20 w-full border-b border-gold-100 px-4 py-2 text-left text-sm text-slate-800 last:border-b-0"
                   @mousedown.prevent="selectLocationSuggestion(suggestion)"
                 >
                   {{ suggestion.label }}
@@ -262,50 +262,50 @@
 
           <div
             v-if="hasLocationPermission"
-            class="overflow-hidden rounded-xl border border-gray-200 shadow-sm"
+            class="overflow-hidden rounded-xl border border-gold-200 shadow-sm"
           >
             <div id="map" class="z-0 h-80 w-full"></div>
           </div>
           <div
             v-else
-            class="text-text-light rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5 text-sm"
+            class="text-slate-600 rounded-xl border border-dashed border-gold-300 bg-cream-50 p-5 text-sm"
           >
             Please allow location access to load the map.
           </div>
           <div class="mt-2 flex items-center justify-between text-sm">
-            <p v-if="form.latitude" class="text-success flex items-center font-medium">
+            <p v-if="form.latitude" class="text-green-600 flex items-center font-medium">
               <MapPinIcon class="mr-1 h-4 w-4" />
               Location selected: {{ form.latitude.toFixed(6) }}, {{ form.longitude.toFixed(6) }}
             </p>
             <p
               v-else-if="hasLocationPermission && currentLocation"
-              class="text-primary flex items-center font-medium"
+              class="text-gold-600 flex items-center font-medium"
             >
               <MapPinIcon class="mr-1 h-4 w-4" />
               You are here: {{ currentLocation.latitude.toFixed(6) }},
               {{ currentLocation.longitude.toFixed(6) }}
             </p>
-            <p v-else class="text-text-light flex items-center">
+            <p v-else class="text-slate-600 flex items-center">
               <ExclamationCircleIcon class="mr-1 h-4 w-4" />
               Allow location access to start selecting issue location
             </p>
           </div>
-          <p v-if="error && error.includes('location')" class="text-danger mt-2 text-sm">
+          <p v-if="error && error.includes('location')" class="text-red-600 mt-2 text-sm">
             {{ error }}
           </p>
         </section>
 
         <!-- Terms & Submit -->
-        <div class="border-t border-gray-100 pt-6">
+        <div class="border-t border-gold-200 pt-6">
           <div class="mb-6 flex items-start gap-3">
             <input
               id="terms"
               v-model="form.agreeToTerms"
               type="checkbox"
-              class="text-primary focus:ring-primary mt-1 rounded border-gray-300"
+              class="text-gold-600 focus:ring-gold-500 mt-1 rounded border-gold-200"
               required
             />
-            <label for="terms" class="text-text-light cursor-pointer text-sm select-none">
+            <label for="terms" class="text-slate-600 cursor-pointer text-sm select-none">
               I confirm that this information is accurate and will help improve our community
             </label>
           </div>
@@ -315,14 +315,14 @@
             <button
               type="submit"
               :disabled="isSubmitting || !form.latitude || !form.longitude"
-              class="btn-primary flex-1 py-3"
+              class="bg-gold-600 hover:bg-gold-700 flex-1 py-3 rounded-lg text-white font-semibold transition-colors disabled:opacity-60"
             >
               <ArrowPathIcon v-if="isSubmitting" class="mr-2 h-5 w-5 animate-spin" />
               {{ isSubmitting ? 'Submitting Report...' : 'Submit Report' }}
             </button>
             <router-link
               to="/dashboard"
-              class="text-text flex-1 rounded-lg border border-gray-200 bg-white px-4 py-3 text-center font-semibold transition-colors hover:border-gray-300 hover:bg-gray-50"
+              class="text-slate-700 flex-1 rounded-lg border border-gold-200 bg-white px-4 py-3 text-center font-semibold transition-colors hover:border-gold-300 hover:bg-cream-50"
             >
               Cancel
             </router-link>
@@ -331,9 +331,9 @@
           <!-- Error Message -->
           <div
             v-if="error && !error.includes('location')"
-            class="bg-danger-light/20 border-danger/20 mt-4 rounded-lg border p-4"
+            class="bg-red-50/20 border-red-200/50 mt-4 rounded-lg border p-4"
           >
-            <p class="text-danger flex items-center text-sm">
+            <p class="text-red-600 flex items-center text-sm">
               <ExclamationCircleIcon class="mr-2 h-5 w-5" />
               {{ error }}
             </p>
@@ -342,9 +342,9 @@
           <!-- Success Message -->
           <div
             v-if="successMessage"
-            class="bg-success-light/20 border-success/20 mt-4 rounded-lg border p-4"
+            class="bg-green-50/20 border-green-200/50 mt-4 rounded-lg border p-4"
           >
-            <p class="text-success flex items-center text-sm">
+            <p class="text-green-600 flex items-center text-sm">
               <CheckCircleIcon class="mr-2 h-5 w-5" />
               {{ successMessage }}
             </p>

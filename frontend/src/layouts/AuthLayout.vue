@@ -1,17 +1,7 @@
 <template>
   <div
-    class="bg-bg relative flex min-h-screen flex-col items-center justify-center overflow-hidden p-4"
+    class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden p-4"
   >
-    <!-- Decorative background elements -->
-    <div class="pointer-events-none absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
-      <div
-        class="bg-primary/5 absolute -top-[20%] -right-[10%] h-[50%] w-[50%] rounded-full blur-3xl"
-      ></div>
-      <div
-        class="bg-accent/5 absolute bottom-[0%] -left-[10%] h-[40%] w-[40%] rounded-full blur-3xl"
-      ></div>
-    </div>
-
     <div
       class="shadow-primary/5 animate-fade-in-up relative z-10 w-full max-w-lg rounded-2xl border border-gray-100 bg-white p-8 shadow-xl"
     >

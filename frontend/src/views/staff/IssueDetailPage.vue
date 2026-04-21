@@ -1,17 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pb-12">
+  <div class="min-h-screen bg-cream-50 pb-12">
     <!-- Header -->
-    <div class="bg-white shadow">
+    <div class="bg-white shadow border-b border-gold-200/60">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <router-link
               :to="backRoute"
-              class="flex items-center text-gray-500 hover:text-gray-700"
+              class="flex items-center text-slate-600 hover:text-slate-800"
             >
               <ArrowLeftIcon class="h-5 w-5" />
             </router-link>
-            <h1 class="text-2xl font-bold text-gray-900">Manage Issue #{{ issue?.id }}</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Manage Issue #{{ issue?.id }}</h1>
           </div>
           <div class="flex items-center gap-3">
             <span
@@ -30,7 +30,7 @@
 
     <div v-if="isLoading" class="flex h-64 items-center justify-center">
       <div
-        class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+        class="h-8 w-8 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
       ></div>
     </div>
 
@@ -64,18 +64,18 @@
       <!-- Main Column -->
       <div class="space-y-6 lg:col-span-2">
         <!-- Issue Info -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="overflow-hidden rounded-lg bg-white shadow border border-gold-200/50">
           <div class="p-6">
             <div class="flex items-center justify-between">
               <span
-                class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800"
+                class="inline-flex items-center rounded-full bg-gold-100 px-2.5 py-0.5 text-xs font-medium text-gold-800"
               >
                 {{ formatCategory(issue.category) }}
               </span>
-              <span class="text-sm text-gray-500">{{ formatDate(issue.created_at) }}</span>
+              <span class="text-sm text-slate-600">{{ formatDate(issue.created_at) }}</span>
             </div>
-            <h2 class="mt-4 text-xl font-bold text-gray-900">{{ issue.title }}</h2>
-            <p class="mt-4 whitespace-pre-wrap text-gray-700">{{ issue.description }}</p>
+            <h2 class="mt-4 text-xl font-bold text-slate-900">{{ issue.title }}</h2>
+            <p class="mt-4 whitespace-pre-wrap text-slate-700">{{ issue.description }}</p>
 
             <div v-if="issue.image_url" class="mt-6">
               <img
@@ -90,20 +90,20 @@
         <!-- Location (Leaflet Map) -->
         <div
           v-if="issue.latitude && issue.longitude"
-          class="overflow-hidden rounded-lg bg-white shadow"
+          class="overflow-hidden rounded-lg bg-white shadow border border-gold-200/50"
         >
           <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900">Location</h3>
+            <h3 class="text-lg font-medium text-slate-900">Location</h3>
             <div v-if="issue.location" class="mt-4 mb-4">
-              <p class="flex items-start text-gray-700">
-                <MapPinIcon class="mt-0.5 mr-2 h-5 w-5 shrink-0 text-blue-600" />
+              <p class="flex items-start text-slate-700">
+                <MapPinIcon class="mt-0.5 mr-2 h-5 w-5 shrink-0 text-gold-700" />
                 <span class="font-semibold">{{ issue.location }}</span>
               </p>
-              <p class="mt-1 ml-7 text-sm text-gray-500">
+              <p class="mt-1 ml-7 text-sm text-slate-600">
                 Coordinates: {{ issue.latitude.toFixed(6) }}, {{ issue.longitude.toFixed(6) }}
               </p>
             </div>
-            <div id="staff-issue-map" class="mt-4 h-64 rounded-lg bg-gray-100"></div>
+            <div id="staff-issue-map" class="mt-4 h-64 rounded-lg bg-gold-50"></div>
           </div>
         </div>
       </div>
@@ -111,11 +111,11 @@
       <!-- Sidebar -->
       <div class="space-y-6">
         <!-- Status Management -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="overflow-hidden rounded-lg bg-white shadow border border-gold-200/50">
           <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900">Update Status</h3>
+            <h3 class="text-lg font-medium text-slate-900">Update Status</h3>
             <div class="mt-4 space-y-3">
-              <p class="mb-2 text-sm text-gray-500">
+              <p class="mb-2 text-sm text-slate-600">
                 Current status: <span class="font-medium">{{ formatStatus(issue.status) }}</span>
               </p>
 
@@ -128,15 +128,15 @@
                   class="flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors"
                   :class="[
                     issue.status === status.value
-                      ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+                      ? 'cursor-not-allowed border-gold-200 bg-gold-100 text-gold-500'
                       : updatingStatus !== null
-                        ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
-                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+                        ? 'cursor-not-allowed border-gold-200 bg-gold-50 text-gold-500'
+                        : 'border-gold-200 bg-white text-slate-700 hover:bg-gold-50',
                   ]"
                 >
                   <div
                     v-if="updatingStatus === status.value"
-                    class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+                    class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gold-300 border-t-gold-600"
                   ></div>
                   <component
                     v-else
@@ -152,40 +152,40 @@
         </div>
 
         <!-- Issue Details Sidebar -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="overflow-hidden rounded-lg bg-white shadow border border-gold-200/50">
           <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900">Details</h3>
+            <h3 class="text-lg font-medium text-slate-900">Details</h3>
             <dl class="mt-4 space-y-4">
               <div>
-                <dt class="text-sm font-medium text-gray-500">Priority</dt>
-                <dd class="mt-1 flex items-center text-sm text-gray-900 capitalize">
-                  <ExclamationCircleIcon class="mr-1.5 h-4 w-4 text-gray-400" />
+                <dt class="text-sm font-medium text-slate-600">Priority</dt>
+                <dd class="mt-1 flex items-center text-sm text-slate-900 capitalize">
+                  <ExclamationCircleIcon class="mr-1.5 h-4 w-4 text-gold-500" />
                   {{ issue.priority }}
                 </dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-500">Upvotes</dt>
-                <dd class="mt-1 flex items-center text-sm text-gray-900">
-                  <HandThumbUpIcon class="mr-1.5 h-4 w-4 text-gray-400" />
+                <dt class="text-sm font-medium text-slate-600">Upvotes</dt>
+                <dd class="mt-1 flex items-center text-sm text-slate-900">
+                  <HandThumbUpIcon class="mr-1.5 h-4 w-4 text-gold-500" />
                   {{ issue.upvote_count }}
                 </dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-500">Reporter</dt>
+                <dt class="text-sm font-medium text-slate-600">Reporter</dt>
                 <dd class="mt-1 text-sm">
                   <router-link
                     :to="`/profile/${issue.user_id}`"
-                    class="font-medium text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+                    class="font-medium text-gold-700 transition-colors hover:text-gold-900 hover:underline"
                   >
                     {{ issue.user_name }}
                   </router-link>
                 </dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-500">Assigned Staff</dt>
-                <dd class="mt-1 text-sm text-gray-900">
+                <dt class="text-sm font-medium text-slate-600">Assigned Staff</dt>
+                <dd class="mt-1 text-sm text-slate-900">
                   {{ issue.assigned_staff_name || 'Not assigned' }}
-                  <span v-if="issue.assigned_staff_email" class="block text-xs text-gray-500">
+                  <span v-if="issue.assigned_staff_email" class="block text-xs text-slate-600">
                     {{ issue.assigned_staff_email }}
                   </span>
                 </dd>
@@ -194,10 +194,10 @@
           </div>
         </div>
 
-        <div v-if="authStore.isAdmin" class="overflow-hidden rounded-lg bg-white shadow">
+        <div v-if="authStore.isAdmin" class="overflow-hidden rounded-lg bg-white shadow border border-gold-200/50">
           <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900">Assign to Staff</h3>
-            <p class="mt-1 text-sm text-gray-500">
+            <h3 class="text-lg font-medium text-slate-900">Assign to Staff</h3>
+            <p class="mt-1 text-sm text-slate-600">
               Use advanced search and dropdown selection to assign this issue.
             </p>
 
@@ -206,12 +206,12 @@
                 v-model="staffSearch"
                 type="text"
                 placeholder="Search by first name, last name, or email"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                class="w-full rounded-md border border-gold-200 px-3 py-2 text-sm focus:border-gold-400 focus:outline-none focus:ring-2 focus:ring-gold-200"
               />
 
               <div
                 v-if="filteredStaffOptions.length > 0"
-                class="rounded-md border border-gray-200 bg-white"
+                class="rounded-md border border-gold-200 bg-white"
               >
                 <select
                   v-model="selectedStaffId"
@@ -231,9 +231,9 @@
 
               <div
                 v-if="staffSuggestions.length > 0"
-                class="max-h-44 overflow-y-auto rounded-md border border-gray-200"
+                class="max-h-44 overflow-y-auto rounded-md border border-gold-200"
               >
-                <div class="border-b border-gray-100 px-3 py-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                <div class="border-b border-gold-100 px-3 py-2 text-xs font-semibold tracking-wide text-slate-600 uppercase">
                   Suggestions
                 </div>
                 <button
@@ -241,36 +241,36 @@
                   :key="member.id"
                   type="button"
                   @click="selectStaff(member)"
-                  class="flex w-full items-start justify-between border-b border-gray-100 px-3 py-2 text-left text-sm transition-colors last:border-b-0 hover:bg-gray-50"
+                  class="flex w-full items-start justify-between border-b border-gold-100 px-3 py-2 text-left text-sm transition-colors last:border-b-0 hover:bg-gold-50"
                 >
                   <span>
-                    <span class="font-medium text-gray-900">
+                    <span class="font-medium text-slate-900">
                       {{ member.first_name }} {{ member.last_name }}
                     </span>
-                    <span class="block text-xs text-gray-500">{{ member.email }}</span>
+                    <span class="block text-xs text-slate-600">{{ member.email }}</span>
                   </span>
                 </button>
               </div>
 
               <p
                 v-else-if="staffSearch.trim() && !isSearchingStaff"
-                class="text-xs text-gray-500"
+                class="text-xs text-slate-600"
               >
                 No staff suggestions found.
               </p>
 
-              <p v-if="isSearchingStaff" class="text-xs text-gray-500">Loading staff list...</p>
+              <p v-if="isSearchingStaff" class="text-xs text-slate-600">Loading staff list...</p>
 
-              <div v-if="selectedStaff" class="rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-800">
+              <div v-if="selectedStaff" class="rounded-md bg-gold-100 px-3 py-2 text-sm text-gold-800">
                 Selected: {{ selectedStaff.first_name }} {{ selectedStaff.last_name }}
-                <span class="block text-xs text-blue-600">{{ selectedStaff.email }}</span>
+                <span class="block text-xs text-gold-700">{{ selectedStaff.email }}</span>
               </div>
 
               <button
                 type="button"
                 @click="assignStaff"
                 :disabled="!selectedStaff || isAssigningStaff"
-                class="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                class="w-full rounded-md bg-gold-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {{ isAssigningStaff ? 'Assigning...' : 'Assign Issue' }}
               </button>
@@ -349,9 +349,9 @@ const availableStatuses = [
     value: 'pending_review',
     label: 'Pending Review',
     icon: InboxIcon,
-    colorClass: 'text-yellow-500',
+    colorClass: 'text-gold-600',
   },
-  { value: 'in_progress', label: 'In Progress', icon: ClockIcon, colorClass: 'text-blue-500' },
+  { value: 'in_progress', label: 'In Progress', icon: ClockIcon, colorClass: 'text-saffron-600' },
   { value: 'resolved', label: 'Resolved', icon: CheckCircleIcon, colorClass: 'text-green-500' },
 ]
 
@@ -378,13 +378,13 @@ const formatStatus = (status) => {
 const getStatusColor = (status) => {
   switch (status) {
     case 'pending_review':
-      return 'bg-yellow-100 text-yellow-800'
+      return 'bg-gold-100 text-gold-800'
     case 'in_progress':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-saffron-100 text-saffron-800'
     case 'resolved':
       return 'bg-green-100 text-green-800'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'bg-cream-100 text-slate-700'
   }
 }
 

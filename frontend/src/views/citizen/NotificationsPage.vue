@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-cream-50">
     <div class="bg-white shadow">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold text-gray-900">Notifications</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Notifications</h1>
       </div>
     </div>
 
@@ -14,8 +14,8 @@
             :class="[
               'rounded-md px-4 py-2 text-sm font-medium transition-colors',
               filterType === 'all'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+                ? 'bg-gold-600 text-white shadow-sm'
+                : 'border border-gold-200 bg-white text-slate-700 hover:bg-gold-50',
             ]"
           >
             All
@@ -25,14 +25,14 @@
             :class="[
               'rounded-md px-4 py-2 text-sm font-medium transition-colors',
               filterType === 'unread'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+                ? 'bg-gold-600 text-white shadow-sm'
+                : 'border border-gold-200 bg-white text-slate-700 hover:bg-gold-50',
             ]"
           >
             Unread
             <span
               v-if="unreadCount > 0"
-              class="ml-2 inline-flex items-center justify-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-600"
+              class="ml-2 inline-flex items-center justify-center rounded-full bg-gold-100 px-2 py-0.5 text-xs font-bold text-gold-600"
             >
               {{ unreadCount }}
             </span>
@@ -42,7 +42,7 @@
         <button
           v-if="unreadCount > 0"
           @click="markAllAsRead"
-          class="text-sm font-medium text-blue-600 transition-colors hover:text-blue-700"
+          class="text-sm font-medium text-gold-600 transition-colors hover:text-gold-700"
         >
           Mark all as read
         </button>
@@ -50,7 +50,7 @@
 
       <div v-if="isLoading" class="flex items-center justify-center py-12">
         <div
-          class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+          class="h-8 w-8 animate-spin rounded-full border-4 border-gold-600 border-t-transparent"
         ></div>
       </div>
 
@@ -58,9 +58,9 @@
         v-else-if="notifications.length === 0"
         class="rounded-lg bg-white p-12 text-center shadow"
       >
-        <BellIcon class="mx-auto mb-4 h-16 w-16 text-gray-300" />
-        <h3 class="mb-2 text-lg font-medium text-gray-900">No notifications</h3>
-        <p class="text-sm text-gray-500">You're all caught up!</p>
+        <BellIcon class="mx-auto mb-4 h-16 w-16 text-slate-400" />
+        <h3 class="mb-2 text-lg font-medium text-slate-900">No notifications</h3>
+        <p class="text-sm text-slate-600">You're all caught up!</p>
       </div>
 
       <div v-else class="space-y-3">
@@ -70,22 +70,22 @@
           :to="`/issues/${notification.issue_id}`"
           @click="markAsRead(notification.id)"
           class="block rounded-lg bg-white p-5 shadow transition-all hover:shadow-md"
-          :class="{ 'border-l-4 border-blue-600': !notification.is_read }"
+          :class="{ 'border-l-4 border-gold-600': !notification.is_read }"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0 flex-1">
               <div class="mb-2 flex items-center gap-2">
-                <h3 class="text-base font-semibold text-gray-900">
+                <h3 class="text-base font-semibold text-slate-900">
                   {{ notification.title }}
                 </h3>
                 <span
                   v-if="!notification.is_read"
-                  class="flex h-2 w-2 rounded-full bg-blue-600"
+                  class="flex h-2 w-2 rounded-full bg-gold-600"
                 ></span>
               </div>
-              <p class="mb-3 text-sm text-gray-600">{{ notification.message }}</p>
+              <p class="mb-3 text-sm text-slate-600">{{ notification.message }}</p>
 
-              <div class="flex items-center gap-4 text-xs text-gray-400">
+              <div class="flex items-center gap-4 text-xs text-slate-600">
                 <span class="flex items-center gap-1">
                   <ClockIcon class="h-4 w-4" />
                   {{ formatDate(notification.created_at) }}
@@ -98,7 +98,7 @@
             </div>
 
             <div class="shrink-0">
-              <ChevronRightIcon class="h-5 w-5 text-gray-400" />
+              <ChevronRightIcon class="h-5 w-5 text-slate-400" />
             </div>
           </div>
         </router-link>
