@@ -40,7 +40,7 @@
       <!-- Profile Card -->
       <div v-else-if="profileUser" class="overflow-hidden rounded-xl bg-white shadow-md">
         <!-- Banner/Header -->
-        <div class="h-32 bg-gold-600"></div>
+        <div class="h-32 bg-green-500"></div>
 
         <!-- Profile Info -->
         <div class="px-8 pb-8">

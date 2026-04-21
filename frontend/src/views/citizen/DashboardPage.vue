@@ -29,7 +29,7 @@
             <div class="mt-6 flex flex-wrap gap-3">
               <router-link
                 to="/report-issue"
-                class="dashboard-action dashboard-report-cta inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-saffron-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold-500/20 transition-transform hover:-translate-y-0.5"
+                class="dashboard-action dashboard-report-cta inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-saffron-500 px-5 py-3 text-sm font-semibold text-black shadow-lg shadow-gold-500/20 transition-transform hover:-translate-y-0.5"
               >
                 <PlusCircleIcon class="h-5 w-5" />
                 Report issue
@@ -188,11 +188,11 @@
           <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_30%)]"></div>
           <div class="relative flex items-center gap-4">
             <div class="rounded-2xl bg-white/15 p-3 backdrop-blur-xl">
-              <PlusCircleIcon class="h-8 w-8 text-white" />
+              <PlusCircleIcon class="h-8 w-8 text-black" />
             </div>
             <div>
               <h3 class="text-xl font-bold">Report Issue</h3>
-              <p class="mt-1 text-gold-50/90">Add a new community concern in a few quick steps.</p>
+              <p class="mt-1 text-black/90">Add a new community concern in a few quick steps.</p>
             </div>
           </div>
         </router-link>
@@ -343,7 +343,7 @@
                 </div>
                 <router-link
                   :to="`/issues/${issue.id}`"
-                  class="inline-flex items-center rounded-full bg-gold-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-gold-500/15 transition-colors hover:bg-gold-700"
+                  class="inline-flex items-center rounded-full bg-gold-600 px-4 py-2 text-sm font-semibold text-black shadow-lg shadow-gold-500/15 transition-colors hover:bg-gold-700"
                 >
                   View <ArrowRightIcon class="ml-1 h-4 w-4" />
                 </router-link>
