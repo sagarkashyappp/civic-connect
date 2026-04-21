@@ -9,7 +9,7 @@
         </div>
         <router-link
           to="/report-issue"
-          class="flex items-center gap-2 rounded-lg bg-gold-600 px-6 py-3 font-semibold text-white shadow-md transition-all hover:bg-gold-700 hover:shadow-lg"
+          class="flex items-center gap-2 rounded-lg bg-gold-600 px-6 py-3 font-semibold text-black shadow-md transition-all hover:bg-gold-700 hover:shadow-lg"
         >
           <PlusIcon class="h-5 w-5" />
           Report Issue
@@ -24,7 +24,7 @@
             <button
               @click="viewMode = 'list'"
               :class="{
-                'bg-gold-600 text-white': viewMode === 'list',
+                'bg-gold-600 text-black': viewMode === 'list',
                 'bg-gold-100/60 text-gold-700': viewMode !== 'list',
               }"
               class="flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors"
@@ -35,7 +35,7 @@
             <button
               @click="viewMode = 'map'"
               :class="{
-                'bg-gold-600 text-white': viewMode === 'map',
+                'bg-gold-600 text-black': viewMode === 'map',
                 'bg-gold-100/60 text-gold-700': viewMode !== 'map',
               }"
               class="flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors"
@@ -246,7 +246,7 @@
                 <!-- View Details Link -->
                 <router-link
                   :to="`/issues/${issue.id}`"
-                  class="w-full rounded-lg bg-slate-700 px-4 py-2 text-center font-semibold text-cream-50 transition-colors hover:bg-slate-800"
+                  class="w-full rounded-lg bg-green-700 px-4 py-2 text-center font-semibold text-white transition-colors hover:bg-slate-800"
                 >
                   View Details
                 </router-link>

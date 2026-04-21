@@ -331,12 +331,22 @@ const handleRegister = async () => {
     })
 
     if (response.success) {
-      toast.success('Account created! Please verify your email.')
+      // Check if email verification should be skipped
+      if (response.skip_email_verification) {
+        toast.success('Account created successfully! Redirecting to login...')
+        
+        // Redirect to login page since account is already created
+        setTimeout(() => {
+          router.push('/login')
+        }, 1500)
+      } else {
+        toast.success('Account created! Please verify your email.')
 
-      // Store email for verification page
-      sessionStorage.setItem('registeredEmail', response.email)
+        // Store email for verification page
+        sessionStorage.setItem('registeredEmail', response.email)
 
-      router.push('/verify-email')
+        router.push('/verify-email')
+      }
     }
   } catch (err) {
     error.value = err || 'Registration failed. Please try again.'

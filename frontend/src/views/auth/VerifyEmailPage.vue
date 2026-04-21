@@ -5,15 +5,16 @@
       <EnvelopeIcon class="text-accent h-6 w-6" />
     </div>
     <h2 class="text-primary mb-2 text-2xl font-bold">Verify Your Email</h2>
-    <p class="text-muted">We sent a verification code to your email address</p>
+    <p class="text-muted">We've sent a verification code to your email address</p>
   </div>
 
   <!-- Verification Form -->
   <form @submit.prevent="handleVerify" class="space-y-6">
     <!-- Email Display -->
     <div class="bg-accent/5 border-accent/20 rounded-lg border p-4">
-      <p class="text-muted mb-1 text-sm">Verification code sent to:</p>
-      <p class="text-primary font-semibold">{{ displayEmail }}</p>
+      <p class="text-muted mb-2 text-sm font-medium">Verification code sent to:</p>
+      <p class="text-primary text-lg font-semibold">{{ displayEmail }}</p>
+      <p class="text-muted mt-1 text-xs">Check this email for your 6-digit code</p>
     </div>
 
     <!-- OTP Input -->

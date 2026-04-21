@@ -70,9 +70,13 @@ class UserController {
             $otp_code = generateOTP(6);
             $otp_expires = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
+            // When all required fields are filled, skip email verification
+            $email_verified = 1; // Set to verified directly
+            $skip_email_verification = true;
+
             $stmt = $this->pdo->prepare("
                 INSERT INTO users (email, password_hash, first_name, last_name, phone, otp_code, otp_expires_at, email_verified)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             $phone = $data['phone'] ?? null;
@@ -83,27 +87,11 @@ class UserController {
                 $data['last_name'],
                 $phone,
                 $otp_code,
-                $otp_expires
+                $otp_expires,
+                $email_verified
             ]);
 
             $user_id = $this->pdo->lastInsertId();
-
-            // Send verification email with OTP
-            $emailSent = $this->sendVerificationEmail($data['email'], $data['first_name'], $otp_code);
-            
-            if (!$emailSent) {
-                // Email sending failed - log  and inform user
-                error_log("CRITICAL: Failed to send verification email to: " . $data['email']);
-                // Still allow registration to complete, but warn user
-                sendResponse([
-                    'success' => true,
-                    'message' => 'User registered successfully. However, there was an issue sending the verification email. Please use the resend OTP option.',
-                    'user_id' => $user_id,
-                    'email' => $data['email'],
-                    'email_warning' => true
-                ], 201);
-                return;
-            }
 
             // Log audit trail
             Middleware::logAuditTrail($user_id, 'USER_CREATED', 'users', $user_id, null, [
@@ -114,9 +102,10 @@ class UserController {
 
             sendResponse([
                 'success' => true,
-                'message' => 'User registered successfully. Please verify your email using the OTP code sent to your email address.',
+                'message' => 'Account created successfully! You can now log in.',
                 'user_id' => $user_id,
-                'email' => $data['email']
+                'email' => $data['email'],
+                'skip_email_verification' => $skip_email_verification
             ], 201);
 
         } catch (PDOException $e) {

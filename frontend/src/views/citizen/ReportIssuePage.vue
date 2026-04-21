@@ -114,32 +114,35 @@
             <div>
               <label class="text-slate-700 mb-2 block text-sm font-medium">Priority Level</label>
               <div class="flex gap-3">
-                <label class="inline-flex cursor-pointer items-center">
-                  <input type="radio" v-model="form.priority" value="low" class="peer sr-only" />
-                  <span
-                    class="text-slate-600 peer-checked:text-slate-900 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors peer-checked:border-gold-300 peer-checked:bg-gold-100"
-                    >Low</span
-                  >
-                </label>
-                <label class="inline-flex cursor-pointer items-center">
-                  <input type="radio" v-model="form.priority" value="medium" class="peer sr-only" />
-                  <span
-                    class="text-slate-600 peer-checked:bg-gold-200 peer-checked:text-gold-900 peer-checked:border-gold-400 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors"
-                    >Medium</span
-                  >
-                </label>
-                <label class="inline-flex cursor-pointer items-center">
-                  <input type="radio" v-model="form.priority" value="high" class="peer sr-only" />
-                  <span
-                    :class="
-                      aiResult.autoFilled && form.priority === 'high'
+                <button
+                  v-for="pri in priorities"
+                  :key="pri.value"
+                  type="button"
+                  class="relative cursor-pointer rounded-lg focus:ring-2 focus:ring-offset-2 focus:outline-none transition-all"
+                  :class="
+                    form.priority === pri.value
+                      ? pri.value === 'high'
                         ? 'ring-2 ring-saffron-400 ring-offset-1'
                         : ''
+                      : ''
+                  "
+                  :aria-pressed="form.priority === pri.value"
+                  @click.prevent="selectPriority(pri.value)"
+                >
+                  <span
+                    class="block rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors"
+                    :class="
+                      form.priority === pri.value
+                        ? pri.value === 'low'
+                          ? 'border-gold-300 bg-gold-100 text-gold-900'
+                          : pri.value === 'medium'
+                            ? 'border-gold-400 bg-gold-200 text-gold-900'
+                            : 'border-saffron-400 bg-saffron-200 text-saffron-900'
+                        : 'border-gold-200 text-slate-600'
                     "
-                    class="text-slate-600 peer-checked:bg-saffron-200 peer-checked:text-saffron-900 peer-checked:border-saffron-400 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors"
-                    >High</span
+                    >{{ pri.label }}</span
                   >
-                </label>
+                </button>
               </div>
               <p class="mt-2 inline-block rounded-lg bg-saffron-50 p-2 text-xs text-saffron-700">
                 <ExclamationCircleIcon class="mr-1 inline h-3 w-3" />
@@ -361,7 +364,7 @@
             <button
               type="submit"
               :disabled="isSubmitDisabled"
-              class="bg-gold-600 hover:bg-gold-700 flex-1 py-3 rounded-lg text-white font-semibold transition-colors disabled:opacity-60"
+              class="bg-gold-600 hover:bg-gold-700 flex-1 py-3 rounded-lg text-black font-semibold transition-colors disabled:opacity-60"
             >
               <ArrowPathIcon v-if="isSubmitting" class="mr-2 h-5 w-5 animate-spin" />
               {{ isSubmitting ? 'Submitting Report...' : 'Submit Report' }}
@@ -425,6 +428,12 @@ const issuesStore = useIssuesStore()
 const router = useRouter()
 
 const categories = issuesStore.issueCategoryOptions
+
+const priorities = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+]
 
 const form = ref({
   title: '',
@@ -497,6 +506,13 @@ const selectCategory = (categoryValue) => {
   if (errors.value.category) {
     errors.value.category = ''
   }
+  if (error.value) {
+    error.value = ''
+  }
+}
+
+const selectPriority = (priorityValue) => {
+  form.value.priority = priorityValue
   if (error.value) {
     error.value = ''
   }
@@ -1051,11 +1067,12 @@ const submitIssue = async () => {
       router.push('/dashboard')
     }, 2500)
   } catch (err) {
-    if (err.toString().includes('401')) {
+    const errorMsg = typeof err === 'string' ? err : err.message || 'Failed to report issue. Please try again.'
+    if (errorMsg.includes('401') || errorMsg.includes('Session')) {
       error.value = 'Session expired. Please login again.'
       setTimeout(() => router.push('/login'), 2000)
     } else {
-      error.value = err.message || 'Failed to report issue. Please try again.'
+      error.value = errorMsg
     }
   } finally {
     isSubmitting.value = false
