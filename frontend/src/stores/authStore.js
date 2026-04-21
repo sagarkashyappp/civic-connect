@@ -9,6 +9,8 @@ const USERS_BASE_URL = `${API_BASE_URL}/users`
 // Configure axios to send cookies with requests
 axios.defaults.withCredentials = true
 
+let isAuthInterceptorConfigured = false
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const token = ref(localStorage.getItem('token'))
@@ -59,6 +61,35 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const clearAuthState = () => {
+    user.value = null
+    token.value = null
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setAuthHeader(null)
+  }
+
+  const setupAuthInterceptor = () => {
+    if (isAuthInterceptorConfigured) return
+
+    axios.interceptors.response.use(
+      (response) => response,
+      (err) => {
+        const status = err?.response?.status
+        const requestUrl = err?.config?.url || ''
+
+        // If a protected API request returns 401, clear stale session state.
+        if (status === 401 && requestUrl.includes('/backend/api/')) {
+          clearAuthState()
+        }
+
+        return Promise.reject(err)
+      },
+    )
+
+    isAuthInterceptorConfigured = true
+  }
+
   // Load user from localStorage on init
   const loadUserFromStorage = () => {
     try {
@@ -83,6 +114,8 @@ export const useAuthStore = defineStore('auth', () => {
     setAuthHeader(token.value)
     loadUserFromStorage()
   }
+
+  setupAuthInterceptor()
 
   // Register user
   const register = async (formData) => {
@@ -210,11 +243,7 @@ export const useAuthStore = defineStore('auth', () => {
       console.warn('Logout API error:', err)
     } finally {
       // Clear local state
-      user.value = null
-      token.value = null
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      delete axios.defaults.headers.common['Authorization']
+      clearAuthState()
     }
   }
 
@@ -271,8 +300,7 @@ export const useAuthStore = defineStore('auth', () => {
       } catch (err) {
         console.error('Failed to initialize auth:', err)
         // Clear corrupted data
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
+        clearAuthState()
       }
     }
   }
@@ -296,5 +324,6 @@ export const useAuthStore = defineStore('auth', () => {
     updateUserProfile,
     initializeAuth,
     setAuthHeader,
+    clearAuthState,
   }
 })

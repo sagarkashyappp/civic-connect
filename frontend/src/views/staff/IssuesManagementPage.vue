@@ -241,10 +241,7 @@ const filteredIssues = computed(() => {
 })
 
 const formatCategory = (category) => {
-  return category
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+  return issuesStore.formatIssueCategory(category)
 }
 
 const formatStatus = (status) => {

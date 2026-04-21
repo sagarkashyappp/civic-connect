@@ -32,10 +32,21 @@
             What type of issue is this?
           </h3>
           <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <label v-for="cat in categories" :key="cat.value" class="group relative cursor-pointer">
-              <input type="radio" v-model="form.category" :value="cat.value" class="peer sr-only" />
+            <button
+              v-for="cat in categories"
+              :key="cat.value"
+              type="button"
+              class="group relative cursor-pointer rounded-xl focus:ring-2 focus:ring-gold-400 focus:ring-offset-2 focus:outline-none"
+              :aria-pressed="form.category === cat.value"
+              @click.prevent="selectCategory(cat.value)"
+            >
               <div
-                class="peer-checked:border-gold-400 peer-checked:bg-gold-100/40 group-hover:border-gold-300 rounded-xl border-2 border-gold-100 p-4 text-center transition-all duration-200 peer-checked:shadow-sm"
+                class="group-hover:border-gold-300 rounded-xl border-2 p-4 text-center transition-all duration-200"
+                :class="
+                  form.category === cat.value
+                    ? 'border-gold-400 bg-gold-100/40 shadow-sm'
+                    : 'border-gold-100'
+                "
               >
                 <!-- Icon placeholder (could be dynamic based on category) -->
                 <div
@@ -44,11 +55,12 @@
                   <FolderIcon class="mx-auto h-8 w-8" />
                 </div>
                 <span
-                  class="text-slate-700 peer-checked:text-gold-800 block text-sm font-semibold transition-colors"
+                  class="block text-sm font-semibold transition-colors"
+                  :class="form.category === cat.value ? 'text-gold-800' : 'text-slate-700'"
                   >{{ cat.label }}</span
                 >
               </div>
-            </label>
+            </button>
           </div>
           <p v-if="errors.category" class="text-red-600 mt-2 flex items-center gap-1 text-sm">
             <ExclamationCircleIcon class="h-4 w-4" /> {{ errors.category }}
@@ -119,6 +131,11 @@
                 <label class="inline-flex cursor-pointer items-center">
                   <input type="radio" v-model="form.priority" value="high" class="peer sr-only" />
                   <span
+                    :class="
+                      aiResult.autoFilled && form.priority === 'high'
+                        ? 'ring-2 ring-saffron-400 ring-offset-1'
+                        : ''
+                    "
                     class="text-slate-600 peer-checked:bg-saffron-200 peer-checked:text-saffron-900 peer-checked:border-saffron-400 rounded-lg border border-gold-200 px-3 py-1.5 text-sm font-medium transition-colors"
                     >High</span
                   >
@@ -181,6 +198,35 @@
                   <CheckCircleIcon class="mr-1 h-5 w-5" />
                   {{ form.image.name }}
                 </p>
+                <p v-if="isRunningAiDetection" class="mb-2 text-xs font-medium text-gold-700">
+                  Running AI detection...
+                </p>
+                <div
+                  v-if="aiResult.checked"
+                  class="w-full rounded-lg border px-3 py-2 text-left text-sm"
+                  :class="
+                    aiResult.label === 'pothole'
+                      ? 'border-green-200 bg-green-50 text-green-700'
+                      : 'border-gold-200 bg-cream-50 text-slate-700'
+                  "
+                >
+                  <p class="font-semibold">
+                    AI Detected:
+                    {{ aiResult.label === 'pothole' ? 'Pothole ✅' : 'No pothole detected' }}
+                  </p>
+                  <p class="text-xs">Confidence: {{ aiResult.confidenceText }}</p>
+                  <p v-if="aiResult.autoFilled" class="text-xs font-medium">
+                    Category and priority auto-filled by AI.
+                  </p>
+                  <div v-if="aiResult.annotatedImageUrl" class="mt-2">
+                    <p class="mb-1 text-xs font-medium">Detection Preview</p>
+                    <img
+                      :src="aiResult.annotatedImageUrl"
+                      alt="AI detection preview"
+                      class="h-40 w-full rounded-md border border-gold-200 object-cover"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -314,7 +360,7 @@
           <div class="flex gap-4">
             <button
               type="submit"
-              :disabled="isSubmitting || !form.latitude || !form.longitude"
+              :disabled="isSubmitDisabled"
               class="bg-gold-600 hover:bg-gold-700 flex-1 py-3 rounded-lg text-white font-semibold transition-colors disabled:opacity-60"
             >
               <ArrowPathIcon v-if="isSubmitting" class="mr-2 h-5 w-5 animate-spin" />
@@ -327,6 +373,10 @@
               Cancel
             </router-link>
           </div>
+
+          <p v-if="submitDisabledReason" class="mt-2 text-xs text-slate-600">
+            {{ submitDisabledReason }}
+          </p>
 
           <!-- Error Message -->
           <div
@@ -356,7 +406,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
 import L from 'leaflet'
 import { useIssuesStore } from '../../stores/issuesStore'
 import { useRouter } from 'vue-router'
@@ -374,18 +424,7 @@ import {
 const issuesStore = useIssuesStore()
 const router = useRouter()
 
-// Categories (Mock data for now, could be from API)
-const categories = [
-  { label: 'Roads', value: 'roads' },
-  { label: 'Street Lights', value: 'street_lights' },
-  { label: 'Trash', value: 'trash' },
-  { label: 'Water & Drainage', value: 'water_drainage' },
-  { label: 'Parks & Recreation', value: 'parks_recreation' },
-  { label: 'Public Safety', value: 'public_safety' },
-  { label: 'Graffiti & Vandalism', value: 'graffiti_vandalism' },
-  { label: 'Noise', value: 'noise' },
-  { label: 'Other', value: 'other' },
-]
+const categories = issuesStore.issueCategoryOptions
 
 const form = ref({
   title: '',
@@ -399,7 +438,37 @@ const form = ref({
   agreeToTerms: false,
 })
 
+const isRoadCategorySelected = computed(
+  () => issuesStore.normalizeIssueCategory(form.value.category) === 'roads',
+)
+
+const isSubmitDisabled = computed(() => {
+  if (isSubmitting.value) return true
+  if (isRunningAiDetection.value) return true
+  return false
+})
+
+const submitDisabledReason = computed(() => {
+  if (isSubmitting.value) return 'Submitting your report...'
+  if (!form.value.category) return 'Select an issue category to continue.'
+  if (!form.value.latitude || !form.value.longitude) return 'Select your issue location on the map to enable submit.'
+  if (isRunningAiDetection.value) return 'AI is analyzing your uploaded image. Please wait.'
+  if (isRoadCategorySelected.value && !form.value.image) return 'Road issues require a pothole image before submission.'
+  if (isRoadCategorySelected.value && form.value.image && !(aiResult.value.checked && aiResult.value.autoFilled)) {
+    return 'Upload a clear pothole image and wait for AI verification.'
+  }
+  return ''
+})
+
 const imagePreview = ref(null)
+const isRunningAiDetection = ref(false)
+const aiResult = ref({
+  checked: false,
+  label: 'none',
+  confidenceText: '0%',
+  autoFilled: false,
+  annotatedImageUrl: null,
+})
 const isSubmitting = ref(false)
 const error = ref('')
 const successMessage = ref('')
@@ -421,6 +490,16 @@ const SEARCH_BOX_DELTA = 0.09
 
 const triggerFileInput = () => {
   fileInput.value.click()
+}
+
+const selectCategory = (categoryValue) => {
+  form.value.category = categoryValue
+  if (errors.value.category) {
+    errors.value.category = ''
+  }
+  if (error.value) {
+    error.value = ''
+  }
 }
 
 const handleFileSelect = (event) => {
@@ -452,6 +531,13 @@ const validateAndSetImage = (file) => {
   }
 
   form.value.image = file
+  aiResult.value = {
+    checked: false,
+    label: 'none',
+    confidenceText: '0%',
+    autoFilled: false,
+    annotatedImageUrl: null,
+  }
   error.value = ''
 
   // Create preview
@@ -460,15 +546,84 @@ const validateAndSetImage = (file) => {
     imagePreview.value = e.target.result
   }
   reader.readAsDataURL(file)
+
+  syncAiDetectionWithForm()
+}
+
+const resetAiResult = () => {
+  aiResult.value = {
+    checked: false,
+    label: 'none',
+    confidenceText: '0%',
+    autoFilled: false,
+    annotatedImageUrl: null,
+  }
+}
+
+const syncAiDetectionWithForm = () => {
+  if (!form.value.image || !isRoadCategorySelected.value) {
+    resetAiResult()
+    return
+  }
+
+  runAiDetection(form.value.image)
+}
+
+const runAiDetection = async (file) => {
+  const token = localStorage.getItem('token')
+  if (!token || !isRoadCategorySelected.value) return
+
+  isRunningAiDetection.value = true
+  try {
+    const detection = await issuesStore.detectIssueImageAI(file)
+    const confidence = Number(detection?.confidence || 0)
+    const isPothole = detection?.ai_detection === 'pothole'
+
+    aiResult.value = {
+      checked: true,
+      label: isPothole ? 'pothole' : 'none',
+      confidenceText: `${Math.round(confidence * 100)}%`,
+      autoFilled: Boolean(detection?.ai_auto_filled),
+      annotatedImageUrl: detection?.annotated_image_url || null,
+    }
+
+    if (detection?.ai_auto_filled) {
+      if (detection?.suggested_category) {
+        form.value.category = issuesStore.normalizeIssueCategory(detection.suggested_category)
+      }
+      if (detection?.suggested_priority) {
+        form.value.priority = detection.suggested_priority
+      }
+    }
+  } catch {
+    // Keep issue reporting usable even if AI preview fails.
+    aiResult.value = {
+      checked: true,
+      label: 'none',
+      confidenceText: '0%',
+      autoFilled: false,
+      annotatedImageUrl: null,
+    }
+  } finally {
+    isRunningAiDetection.value = false
+  }
 }
 
 const removeImage = () => {
   form.value.image = null
   imagePreview.value = null
+  resetAiResult()
   if (fileInput.value) {
     fileInput.value.value = ''
   }
 }
+
+watch(
+  () => [form.value.category, form.value.image],
+  () => {
+    syncAiDetectionWithForm()
+  },
+)
 
 const errors = ref({})
 
@@ -825,6 +980,23 @@ const submitIssue = async () => {
     return
   }
 
+  if (isRoadCategorySelected.value) {
+    if (!form.value.image) {
+      error.value = 'Please upload a pothole photo for road issues.'
+      return
+    }
+
+    if (isRunningAiDetection.value) {
+      error.value = 'AI is still analyzing the pothole photo. Please wait.'
+      return
+    }
+
+    if (!aiResult.value.checked || !aiResult.value.autoFilled) {
+      error.value = 'Please upload a clear pothole photo and wait for AI verification before submitting.'
+      return
+    }
+  }
+
   if (!isPointNearCurrentLocation(form.value.latitude, form.value.longitude)) {
     error.value = 'Please select a location within 300 meters of your current positon.'
     return
@@ -854,13 +1026,30 @@ const submitIssue = async () => {
       formData.append('image', form.value.image)
     }
 
-    await issuesStore.createIssue(formData)
+    const result = await issuesStore.createIssue(formData)
 
-    successMessage.value = 'Issue reported successfully! Redirecting...'
+    const confidence = Number(result?.confidence || 0)
+    const confidenceText = `${Math.round(confidence * 100)}%`
+    const isPothole = result?.ai_detection === 'pothole'
+
+    aiResult.value = {
+      checked: true,
+      label: isPothole ? 'pothole' : 'none',
+      confidenceText,
+      autoFilled: Boolean(result?.ai_auto_filled),
+    }
+
+    if (result?.ai_auto_filled) {
+      form.value.category = issuesStore.normalizeIssueCategory('roads')
+      form.value.priority = 'high'
+      successMessage.value = `Issue reported. AI detected pothole (${confidenceText}) and auto-filled category/priority.`
+    } else {
+      successMessage.value = `Issue reported successfully. AI confidence: ${confidenceText}. Redirecting...`
+    }
 
     setTimeout(() => {
       router.push('/dashboard')
-    }, 2000)
+    }, 2500)
   } catch (err) {
     if (err.toString().includes('401')) {
       error.value = 'Session expired. Please login again.'

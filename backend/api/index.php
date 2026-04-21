@@ -243,6 +243,16 @@ function handleIssueRoutes($parts, $method) {
     } else {
         $issue_id = array_shift($parts);
 
+        // POST /issues/detect-image
+        if ($issue_id === 'detect-image') {
+            if ($method === 'POST') {
+                $controller->detectImage();
+            } else {
+                sendError('Method not allowed', 405);
+            }
+            return;
+        }
+
         if (is_numeric($issue_id)) {
             $issue_id = (int)$issue_id;
 

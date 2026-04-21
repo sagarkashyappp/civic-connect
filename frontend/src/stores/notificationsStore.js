@@ -12,16 +12,30 @@ export const useNotificationsStore = defineStore('notifications', {
   }),
 
   actions: {
+    getAuthHeaders() {
+      const token = localStorage.getItem('token')
+      return token ? { Authorization: `Bearer ${token}` } : {}
+    },
+
     async fetchNotifications(unreadOnly = false) {
       this.isLoading = true
       this.error = null
       try {
+        const headers = this.getAuthHeaders()
         const response = await axios.get(`${API_BASE_URL}/notifications`, {
           params: { unread_only: unreadOnly },
+          headers,
         })
         this.notifications = response.data.notifications || []
         return response.data
       } catch (error) {
+        if (error.response?.status === 401) {
+          this.notifications = []
+          this.unreadCount = 0
+          this.error = null
+          return { notifications: [] }
+        }
+
         this.error = error.response?.data?.error || 'Failed to fetch notifications'
         this.notifications = [] // Ensure array on error
         throw error
@@ -32,10 +46,17 @@ export const useNotificationsStore = defineStore('notifications', {
 
     async fetchUnreadCount() {
       try {
-        const response = await axios.get(`${API_BASE_URL}/notifications/unread-count`)
+        const headers = this.getAuthHeaders()
+        const response = await axios.get(`${API_BASE_URL}/notifications/unread-count`, { headers })
         this.unreadCount = response.data.count
         return response.data.count
       } catch (error) {
+        if (error.response?.status === 401) {
+          this.unreadCount = 0
+          this.error = null
+          return 0
+        }
+
         console.error('Failed to fetch unread count:', error)
         return 0
       }
@@ -43,7 +64,8 @@ export const useNotificationsStore = defineStore('notifications', {
 
     async markAsRead(notificationId) {
       try {
-        await axios.put(`${API_BASE_URL}/notifications/${notificationId}/read`)
+        const headers = this.getAuthHeaders()
+        await axios.put(`${API_BASE_URL}/notifications/${notificationId}/read`, {}, { headers })
 
         // Update local state
         const notification = this.notifications.find((n) => n.id === notificationId)
@@ -52,6 +74,11 @@ export const useNotificationsStore = defineStore('notifications', {
           this.unreadCount = Math.max(0, this.unreadCount - 1)
         }
       } catch (error) {
+        if (error.response?.status === 401) {
+          this.error = null
+          return
+        }
+
         console.error('Failed to mark notification as read:', error)
         throw error
       }
@@ -59,12 +86,18 @@ export const useNotificationsStore = defineStore('notifications', {
 
     async markAllAsRead() {
       try {
-        await axios.put(`${API_BASE_URL}/notifications/mark-all-read`)
+        const headers = this.getAuthHeaders()
+        await axios.put(`${API_BASE_URL}/notifications/mark-all-read`, {}, { headers })
 
         // Update local state
         this.notifications.forEach((n) => (n.is_read = true))
         this.unreadCount = 0
       } catch (error) {
+        if (error.response?.status === 401) {
+          this.error = null
+          return
+        }
+
         console.error('Failed to mark all notifications as read:', error)
         throw error
       }

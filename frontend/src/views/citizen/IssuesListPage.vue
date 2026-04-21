@@ -427,18 +427,7 @@ const destroyMap = () => {
 }
 
 const formatCategory = (category) => {
-  const categoryMap = {
-    roads: 'Roads',
-    street_lights: 'Street Lights',
-    trash: 'Trash',
-    water_drainage: 'Water & Drainage',
-    parks_recreation: 'Parks & Recreation',
-    public_safety: 'Public Safety',
-    graffiti_vandalism: 'Graffiti & Vandalism',
-    noise: 'Noise',
-    other: 'Other',
-  }
-  return categoryMap[category] || category
+  return issuesStore.formatIssueCategory(category)
 }
 
 const formatDate = (dateString) => {

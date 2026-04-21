@@ -38,21 +38,55 @@ export const useIssuesStore = defineStore('issues', () => {
     return result
   })
 
-  const issueCategories = computed(() => [
-    'roads',
-    'street_lights',
-    'trash',
-    'water_drainage',
-    'parks_recreation',
-    'public_safety',
-    'graffiti_vandalism',
-    'noise',
-    'other',
-  ])
+  const issueCategoryOptions = [
+    { value: 'roads', label: 'Road' },
+    { value: 'street_lights', label: 'Street Lights' },
+    { value: 'trash', label: 'Dustbin / Trash' },
+    { value: 'water_drainage', label: 'Water & Drainage' },
+    { value: 'parks_recreation', label: 'Parks & Recreation' },
+    { value: 'public_safety', label: 'Public Safety' },
+    { value: 'graffiti_vandalism', label: 'Graffiti & Vandalism' },
+    { value: 'noise', label: 'Noise' },
+    { value: 'other', label: 'Other' },
+  ]
+
+  const categoryAliases = {
+    road: 'roads',
+    roads: 'roads',
+    streetlight: 'street_lights',
+    street_lights: 'street_lights',
+    dustbin: 'trash',
+    trash: 'trash',
+    water: 'water_drainage',
+    water_drainage: 'water_drainage',
+    park: 'parks_recreation',
+    parks_recreation: 'parks_recreation',
+    safety: 'public_safety',
+    public_safety: 'public_safety',
+    graffiti: 'graffiti_vandalism',
+    graffiti_vandalism: 'graffiti_vandalism',
+    noise: 'noise',
+    other: 'other',
+  }
+
+  const issueCategories = computed(() => issueCategoryOptions.map((category) => category.value))
 
   const issueStatuses = computed(() => ['pending_review', 'in_progress', 'resolved'])
 
   const issuePriorities = computed(() => ['low', 'medium', 'high'])
+
+  const normalizeIssueCategory = (category) => {
+    if (!category) return ''
+
+    const normalized = String(category).toLowerCase().trim().replace(/\s+/g, '_')
+    return categoryAliases[normalized] || normalized
+  }
+
+  const formatIssueCategory = (category) => {
+    const normalized = normalizeIssueCategory(category)
+    const option = issueCategoryOptions.find((item) => item.value === normalized)
+    return option?.label || normalized.replace(/_/g, ' ')
+  }
 
   // Fetch all issues
   const fetchIssues = async (params = {}) => {
@@ -114,6 +148,13 @@ export const useIssuesStore = defineStore('issues', () => {
     isLoading.value = true
     error.value = null
     try {
+      if (formData instanceof FormData) {
+        const category = normalizeIssueCategory(formData.get('category'))
+        if (category) {
+          formData.set('category', category)
+        }
+      }
+
       const token = localStorage.getItem('token')
       const response = await axios.post(`${API_BASE_URL}/issues`, formData, {
         headers: {
@@ -121,19 +162,55 @@ export const useIssuesStore = defineStore('issues', () => {
         },
       })
 
-      const newIssue = response.data.issue
-      issues.value.unshift(newIssue)
+      const newIssue = response.data.issue || null
+      if (newIssue) {
+        issues.value.unshift(newIssue)
+      }
 
       return {
         success: true,
         message: response.data.message,
         issue: newIssue,
+        issue_id: response.data.issue_id,
+        ai_detection: response.data.ai_detection,
+        confidence: response.data.confidence,
+        ai_auto_filled: response.data.ai_auto_filled,
       }
     } catch (err) {
       error.value = err.response?.data?.error || 'Failed to create issue'
       throw error.value
     } finally {
       isLoading.value = false
+    }
+  }
+
+  // Detect issue image with AI before full submit
+  const detectIssueImageAI = async (file) => {
+    error.value = null
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        throw new Error('Authentication required')
+      }
+
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const response = await axios.post(`${API_BASE_URL}/issues/detect-image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      return response.data
+    } catch (err) {
+      if (err.response?.status === 401 || err.message === 'Authentication required') {
+        error.value = 'Please login to use AI detection'
+        throw error.value
+      }
+
+      error.value = err.response?.data?.error || 'Failed to run AI image detection'
+      throw error.value
     }
   }
 
@@ -313,9 +390,13 @@ export const useIssuesStore = defineStore('issues', () => {
     issueCategories,
     issueStatuses,
     issuePriorities,
+    issueCategoryOptions,
+    normalizeIssueCategory,
+    formatIssueCategory,
     fetchIssues,
     fetchIssueById,
     createIssue,
+    detectIssueImageAI,
     updateIssue,
     deleteIssue,
     fetchUserIssues,

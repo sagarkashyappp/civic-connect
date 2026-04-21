@@ -62,6 +62,111 @@ function uploadIssueImage($file, $upload_dir = null) {
 }
 
 /**
+ * Run pothole detection on an uploaded issue image.
+ *
+ * @param string $relative_image_path Path relative to backend root (e.g. uploads/issues/file.jpg)
+ * @param float $threshold Confidence threshold to treat as pothole detection
+ * @param bool $save_annotated_image Whether to save an annotated output image with bounding boxes
+ * @return array ['checked'=>bool, 'is_pothole'=>bool, 'confidence'=>float, 'detections'=>array, 'annotated_image_path'=>string|null, 'error'=>string|null]
+ */
+function detectPotholeFromImage($relative_image_path, $threshold = 0.5, $save_annotated_image = false) {
+    $script_path = realpath(__DIR__ . '/../ai/detect.py');
+    $image_path = realpath(__DIR__ . '/../' . ltrim($relative_image_path, '/'));
+
+    if (!$script_path || !file_exists($script_path)) {
+        return [
+            'checked' => false,
+            'is_pothole' => false,
+            'confidence' => 0,
+            'detections' => [],
+            'error' => 'AI script not found'
+        ];
+    }
+
+    if (!$image_path || !file_exists($image_path)) {
+        return [
+            'checked' => false,
+            'is_pothole' => false,
+            'confidence' => 0,
+            'detections' => [],
+            'error' => 'Image file not found for AI detection'
+        ];
+    }
+
+    $python_bin = getenv('AI_PYTHON_BIN') ?: (stripos(PHP_OS, 'WIN') === 0 ? 'python' : 'python3');
+
+    $annotated_relative_path = null;
+    $annotated_absolute_path = null;
+    if ($save_annotated_image) {
+        $annotated_dir_relative = 'uploads/ai_preview/';
+        $annotated_dir_absolute = __DIR__ . '/../' . $annotated_dir_relative;
+        if (!is_dir($annotated_dir_absolute)) {
+            mkdir($annotated_dir_absolute, 0755, true);
+        }
+        $annotated_filename = uniqid('ai_', true) . '.jpg';
+        $annotated_relative_path = $annotated_dir_relative . $annotated_filename;
+        $annotated_absolute_path = realpath($annotated_dir_absolute) . DIRECTORY_SEPARATOR . $annotated_filename;
+    }
+
+    $command = escapeshellarg($python_bin) . ' ' . escapeshellarg($script_path) . ' ' . escapeshellarg($image_path);
+    if ($annotated_absolute_path) {
+        $command .= ' ' . escapeshellarg($annotated_absolute_path);
+    }
+    $command .= ' 2>&1';
+    $output = shell_exec($command);
+
+    if ($output === null) {
+        return [
+            'checked' => false,
+            'is_pothole' => false,
+            'confidence' => 0,
+            'detections' => [],
+            'annotated_image_path' => null,
+            'error' => 'Failed to execute AI detection command'
+        ];
+    }
+
+    $decoded = json_decode(trim($output), true);
+    if (!is_array($decoded)) {
+        return [
+            'checked' => false,
+            'is_pothole' => false,
+            'confidence' => 0,
+            'detections' => [],
+            'annotated_image_path' => null,
+            'error' => 'Invalid AI response: ' . trim($output)
+        ];
+    }
+
+    $detections = isset($decoded['detections']) && is_array($decoded['detections']) ? $decoded['detections'] : $decoded;
+    $max_confidence = 0;
+    $is_pothole = false;
+
+    foreach ($detections as $det) {
+        $confidence = isset($det['confidence']) ? (float)$det['confidence'] : 0;
+        if ($confidence > $max_confidence) {
+            $max_confidence = $confidence;
+        }
+        if ($confidence > $threshold) {
+            $is_pothole = true;
+        }
+    }
+
+    if ($annotated_relative_path && !file_exists(__DIR__ . '/../' . $annotated_relative_path)) {
+        $annotated_relative_path = null;
+    }
+
+    return [
+        'checked' => true,
+        'is_pothole' => $is_pothole,
+        'confidence' => $max_confidence,
+        'detections' => $detections,
+        'annotated_image_path' => $annotated_relative_path,
+        'error' => isset($decoded['success']) && !$decoded['success'] ? ($decoded['error'] ?? null) : null
+    ];
+}
+
+/**
  * Delete an uploaded image
  * 
  * @param string $filepath Relative path to file

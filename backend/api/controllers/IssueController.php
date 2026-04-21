@@ -16,6 +16,55 @@ class IssueController {
     }
 
     /**
+     * Detect pothole from an uploaded image before full issue submission.
+     * POST /api/issues/detect-image
+     */
+    public function detectImage() {
+        if (!Middleware::validateMethod('POST')) {
+            sendError('Method not allowed', 405);
+        }
+
+        Middleware::requireAuth();
+
+        if (!isset($_FILES['image'])) {
+            sendError('No file uploaded', 400);
+        }
+
+        if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            sendError('Image upload failed', 400);
+        }
+
+        $upload_result = uploadIssueImage($_FILES['image']);
+        if (!$upload_result['success']) {
+            sendError($upload_result['error'], 400);
+        }
+
+        $image_path = $upload_result['path'];
+        $ai_result = detectPotholeFromImage($image_path, 0.5, true);
+
+        // Clean temporary image used only for AI preview.
+        deleteImage($image_path);
+
+        $is_pothole = !empty($ai_result['is_pothole']);
+        $confidence = (float)($ai_result['confidence'] ?? 0);
+        $annotated_image_url = null;
+        if (!empty($ai_result['annotated_image_path'])) {
+            $annotated_image_url = 'http://localhost/civic-connect/backend/' . $ai_result['annotated_image_path'];
+        }
+
+        sendResponse([
+            'success' => true,
+            'ai_detection' => $is_pothole ? 'pothole' : 'none',
+            'confidence' => $confidence,
+            'ai_auto_filled' => $is_pothole,
+            'suggested_category' => $is_pothole ? 'roads' : null,
+            'suggested_priority' => $is_pothole ? 'high' : null,
+            'annotated_image_url' => $annotated_image_url,
+            'ai_error' => $ai_result['error'] ?? null,
+        ], 200);
+    }
+
+    /**
      * Get latest assigned staff for an issue from issue_updates.
      */
     private function getAssignedStaffForIssue($issue_id) {
@@ -65,6 +114,32 @@ class IssueController {
             }
             
             $image_path = $upload_result['path'];
+        }
+
+        // AI pothole detection only for road issues.
+        $ai_detection = 'none';
+        $ai_confidence = 0;
+        $ai_auto_filled = false;
+        $ai_error = null;
+
+        $normalized_category = strtolower(trim((string)$data['category']));
+        if ($normalized_category === 'road') {
+            $normalized_category = 'roads';
+            $data['category'] = 'roads';
+        }
+
+        if ($image_path && $data['category'] === 'roads') {
+            $ai_result = detectPotholeFromImage($image_path, 0.5);
+            $ai_confidence = (float)($ai_result['confidence'] ?? 0);
+            $ai_error = $ai_result['error'] ?? null;
+
+            if (!empty($ai_result['is_pothole'])) {
+                $ai_detection = 'pothole';
+                // Keep category aligned with existing internal taxonomy.
+                $data['category'] = 'roads';
+                $data['priority'] = 'high';
+                $ai_auto_filled = true;
+            }
         }
 
         try {
@@ -128,6 +203,11 @@ class IssueController {
             if ($assigned_staff) {
                 $audit_data['auto_assigned_to'] = $assigned_staff['department_name'];
             }
+            $audit_data['ai_detection'] = $ai_detection;
+            $audit_data['ai_confidence'] = $ai_confidence;
+            if ($ai_error) {
+                $audit_data['ai_error'] = $ai_error;
+            }
             
             Middleware::logAuditTrail($user['user_id'], 'ISSUE_CREATED', 'issues', $issue_id, null, $audit_data);
 
@@ -147,7 +227,10 @@ class IssueController {
             sendResponse([
                 'success' => true,
                 'message' => 'Issue created successfully',
-                'issue_id' => $issue_id
+                'issue_id' => $issue_id,
+                'ai_detection' => $ai_detection,
+                'confidence' => $ai_confidence,
+                'ai_auto_filled' => $ai_auto_filled
             ], 201);
         } catch (PDOException $e) {
             sendError('Failed to create issue: ' . $e->getMessage(), 500);

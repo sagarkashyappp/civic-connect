@@ -96,21 +96,43 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '../stores/authStore'
 import { useNotificationsStore } from '../stores/notificationsStore'
 import { BellIcon } from '@heroicons/vue/24/outline'
 
+const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
 const isOpen = ref(false)
 const dropdownContainer = ref(null)
 
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 const unreadCount = computed(() => notificationsStore.unreadCount)
 const notifications = computed(() => (notificationsStore.notifications || []).slice(0, 5))
 const isLoading = computed(() => notificationsStore.isLoading)
 
 let pollInterval = null
 
+const stopPolling = () => {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+}
+
+const startPolling = () => {
+  stopPolling()
+  if (!isAuthenticated.value) return
+
+  notificationsStore.fetchUnreadCount()
+  pollInterval = setInterval(() => {
+    notificationsStore.fetchUnreadCount()
+  }, 30000)
+}
+
 const toggleDropdown = async () => {
+  if (!isAuthenticated.value) return
+
   isOpen.value = !isOpen.value
   if (isOpen.value) {
     await notificationsStore.fetchNotifications()
@@ -155,18 +177,23 @@ const handleClickOutside = (event) => {
 
 // Poll for new notifications every 30 seconds
 onMounted(() => {
-  notificationsStore.fetchUnreadCount()
-  pollInterval = setInterval(() => {
-    notificationsStore.fetchUnreadCount()
-  }, 30000)
+  startPolling()
 
   document.addEventListener('click', handleClickOutside)
 })
 
-onUnmounted(() => {
-  if (pollInterval) {
-    clearInterval(pollInterval)
+watch(isAuthenticated, (authenticated) => {
+  if (!authenticated) {
+    isOpen.value = false
+    notificationsStore.notifications = []
+    notificationsStore.unreadCount = 0
   }
+
+  startPolling()
+})
+
+onUnmounted(() => {
+  stopPolling()
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
